@@ -1,3 +1,21 @@
 <resources>
-    <string name="app_name">Project_News_App</string>
+    <string name="app_name">Project News App</string>
+    <string name="hint_username">email or username</string>
+    <string name="hint_password">password</string>
+    <string name="login">Login</string>
+    <string name="login_guest">Login with Guest Account</string>
+    <string name="dont_have_account">Don\'t have an account? </string>
+    <string name="register">Register</string>
+    <string name="forgot_password">Forgot your password? </string>
+    <string name="recovery">Recovery</string>
+    <string name="hint_first_name">first name</string>
+    <string name="hint_last_name">last name</string>
+    <string name="hint_phone_number">phone number</string>
+    <string name="hint_email">email</string>
+    <string name="hint_confirm_password">confirm password</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="password_recovery">Password Recovery</string>
+    <string name="send_otp">Send OTP</string>
+    <string name="ok">OK</string>
+    <string name="hint_otp">OTP</string>
 </resources>
