@@ -10,7 +10,7 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_login)
 
         val apiService = RetrofitClient.instance.create(ApiService::class.java)
 
@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MainActivity", "News List: $newsList")
                 }
             }
-
             override fun onFailure(call: Call<List<News>>, t: Throwable) {
                 Log.e("MainActivity", "Error: ${t.message}")
             }
