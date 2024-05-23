@@ -4,14 +4,24 @@ import java.util.Date
 import com.google.gson.annotations.SerializedName
 import java.sql.Timestamp
 
+data class LoginRequest(
+    val login: String,
+    val password: String,
+)
+data class LoginResponse(
+    val success: Boolean,
+    val message: String?,
+    val user: MemberData?
+)
+
 data class MemberData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("Mem_Fname") val memFname: String,
     @SerializedName("Mem_Lname") val memLname: String,
-    @SerializedName("Mem_UserName") val memUserName: String,
+    @SerializedName("Mem_Username") val memUsername: String,
     @SerializedName("Mem_Password") val memPassword: String,
     @SerializedName("Mem_Email") val memEmail: String,
-    @SerializedName("Mem_Phone") val memPhone: Char,
+    @SerializedName("Mem_Phone") val memPhone: String,
     @SerializedName("Mem_Status") val memStatus: Int
 )
 

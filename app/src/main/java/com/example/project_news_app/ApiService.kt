@@ -10,6 +10,10 @@ import retrofit2.http.Path
 
 interface ApiService {
 
+    //LoginRequest
+    @POST("api/loginMember/login")
+    fun loginMember(@Body request: LoginRequest): Call<LoginResponse>
+
     //MemberData
     @GET("api/member")
     fun getMember(): Call<List<MemberData>>
