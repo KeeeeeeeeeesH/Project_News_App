@@ -18,15 +18,19 @@ class RecoveryActivity : AppCompatActivity() {
         val otpEditText = findViewById<EditText>(R.id.otp)
         val okButton = findViewById<Button>(R.id.ok_button)
 
+        okButton.isEnabled = false
+        otpEditText.isEnabled = false
+
         supportActionBar?.hide()
 
         sendOtpTextView.setOnClickListener {
-            val phoneNumber = phoneNumberEditText.text.toString()
-            if (phoneNumber.isEmpty()) {
+            val mem_Phone = phoneNumberEditText.text.toString()
+            if (mem_Phone.isEmpty()) {
                 Toast.makeText(this, "Please enter your phone number", Toast.LENGTH_SHORT).show()
             } else {
-                // Implement your logic to send OTP here
-                Toast.makeText(this, "OTP sent to $phoneNumber", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "OTP sent to $mem_Phone", Toast.LENGTH_SHORT).show()
+                okButton.isEnabled = true
+                otpEditText.isEnabled = true
             }
         }
 
@@ -35,9 +39,8 @@ class RecoveryActivity : AppCompatActivity() {
             if (otp.isEmpty()) {
                 Toast.makeText(this, "Please enter the OTP", Toast.LENGTH_SHORT).show()
             } else {
-                // Implement your logic to verify OTP here
                 Toast.makeText(this, "OTP verified", Toast.LENGTH_SHORT).show()
-                // Navigate to reset password or main activity
+                //setContentView(R.layout.activity_main)
             }
         }
     }

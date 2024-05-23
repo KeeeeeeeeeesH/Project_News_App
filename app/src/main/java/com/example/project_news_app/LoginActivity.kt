@@ -41,7 +41,6 @@ class LoginActivity : AppCompatActivity() {
                 // Implement your authentication logic here
                 if (authenticate(username, password)) {
                     Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                    // Navigate to another activity or perform further actions
                 } else {
                     Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show()
                 }

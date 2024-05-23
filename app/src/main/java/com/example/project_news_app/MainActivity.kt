@@ -12,18 +12,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+
         val apiService = RetrofitClient.instance.create(ApiService::class.java)
 
-        // Example GET request to fetch news data
-        apiService.getNews().enqueue(object : Callback<List<News>> {
-            override fun onResponse(call: Call<List<News>>, response: Response<List<News>>) {
+        apiService.getNews().enqueue(object : Callback<List<NewsData>> {
+            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body()
-                    // Handle the news list data
                     Log.d("MainActivity", "News List: $newsList")
                 }
             }
-            override fun onFailure(call: Call<List<News>>, t: Throwable) {
+            override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
                 Log.e("MainActivity", "Error: ${t.message}")
             }
         })
