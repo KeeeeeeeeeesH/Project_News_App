@@ -1,9 +1,6 @@
 //package com.example.project_news_app.ui
 //
 //import android.app.Activity
-//import androidx.compose.animation.AnimatedVisibility
-//import androidx.compose.animation.fadeIn
-//import androidx.compose.animation.fadeOut
 //import androidx.compose.foundation.background
 //import androidx.compose.foundation.layout.*
 //import androidx.compose.foundation.lazy.LazyColumn
@@ -43,7 +40,6 @@
 //fun NewsFeedScreen() {
 //    val navController = rememberNavController()
 //    var searchQuery by remember { mutableStateOf("") }
-//    var isSearchVisible by remember { mutableStateOf(false) }
 //    val newsItems = listOf(
 //        "ข่าว 1",
 //        "ข่าว 2",
@@ -55,7 +51,7 @@
 //    ChangeStatusBarColor(color = Color(0xFFCCFFFF)) // เรียกใช้ฟังก์ชันเพื่อเปลี่ยนสีสถานะบาร์
 //
 //    Scaffold(
-//        topBar = { TopBar(isSearchVisible, searchQuery, onSearchQueryChange = { searchQuery = it }, onSearchIconClick = { isSearchVisible = !isSearchVisible }) },
+//        topBar = { TopBar(searchQuery, onSearchQueryChange = { searchQuery = it }) },
 //        bottomBar = { BottomNavigationBar(navController) }
 //    ) { padding ->
 //        Column(
@@ -64,6 +60,7 @@
 //                .fillMaxSize()
 //                .background(Color(0xFFCCFFFF))
 //        ) {
+//            Spacer(modifier = Modifier.height(16.dp)) // เพิ่มระยะห่างระหว่าง TextField และ TabRow
 //            TabRowExample()
 //            NewsList(newsItems, searchQuery)
 //        }
@@ -72,32 +69,28 @@
 //
 //@OptIn(ExperimentalMaterial3Api::class)
 //@Composable
-//fun TopBar(isSearchVisible: Boolean, searchQuery: String, onSearchQueryChange: (String) -> Unit, onSearchIconClick: () -> Unit) {
+//fun TopBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
 //    TopAppBar(
 //        title = {
-//            AnimatedVisibility(
-//                visible = isSearchVisible,
-//                enter = fadeIn(),
-//                exit = fadeOut()
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Start // จัดเรียงให้อยู่ทางซ้าย
 //            ) {
 //                TextField(
 //                    value = searchQuery,
 //                    onValueChange = onSearchQueryChange,
 //                    placeholder = { Text("ค้นหา...") },
 //                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(8.dp),
+//                        .width(200.dp)  // ปรับขนาดความกว้างของ TextField
+//                        .padding(horizontal = 8.dp, vertical = 4.dp),  // ปรับ padding รอบ ๆ TextField
 //                    colors = TextFieldDefaults.textFieldColors(
 //                        containerColor = Color.White,
 //                        focusedIndicatorColor = Color.Transparent,
 //                        unfocusedIndicatorColor = Color.Transparent
 //                    )
 //                )
-//            }
-//        },
-//        actions = {
-//            IconButton(onClick = onSearchIconClick) {
-//                Icon(painter = painterResource(id = R.drawable.ic_search), contentDescription = "Search")
 //            }
 //        },
 //        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFCCFFFF)) // ตั้งค่าสีพื้นหลังเป็นสีฟ้า
@@ -140,22 +133,24 @@
 //            .padding(16.dp) // เพิ่ม padding รอบ ๆ รายการข่าว
 //            .background(Color.White)
 //    ) {
-//        Row(
+//        Column(
 //            modifier = Modifier
 //                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalAlignment = Alignment.CenterVertically
+//                .padding(16.dp)
 //        ) {
-//            Box(
-//                modifier = Modifier
-//                    .size(70.dp)
-//                    .background(Color.Gray, shape = RoundedCornerShape(8.dp)) // รูปภาพมุมโค้งมน
-//            )
-//            Spacer(modifier = Modifier.width(16.dp))
-//            Column {
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Box(
+//                    modifier = Modifier
+//                        .size(70.dp)
+//                        .background(Color.Gray, shape = RoundedCornerShape(8.dp)) // รูปภาพมุมโค้งมน
+//                )
+//                Spacer(modifier = Modifier.width(16.dp))
 //                Text(text = news, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-//                Text(text = "by Admin | 6 ชั่วโมงที่แล้ว", fontSize = 14.sp)
 //            }
+//            Spacer(modifier = Modifier.height(8.dp))
+//            Text(text = "by Admin | 6 ชั่วโมงที่แล้ว", fontSize = 14.sp)
 //        }
 //    }
 //}
@@ -229,11 +224,10 @@ fun NewsFeedScreen() {
     val navController = rememberNavController()
     var searchQuery by remember { mutableStateOf("") }
     val newsItems = listOf(
-        "ข่าว 1",
-        "ข่าว 2",
-        "ข่าว 3",
-        "ข่าว 4",
-        "ข่าว 5"
+        NewsData("ชื่อข่าว 1", "admin", "วันที่ วง/ดด/ปปป", 4567, 4.55),
+        NewsData("ชื่อข่าว 2", "admin", "วันที่ วง/ดด/ปปป", 1234, 4.25),
+        NewsData("ชื่อข่าว 3", "admin", "วันที่ วง/ดด/ปปป", 7890, 4.75),
+        NewsData("ชื่อข่าว 4", "admin", "วันที่ วง/ดด/ปปป", 5678, 4.45)
     )
 
     ChangeStatusBarColor(color = Color(0xFFCCFFFF)) // เรียกใช้ฟังก์ชันเพื่อเปลี่ยนสีสถานะบาร์
@@ -262,8 +256,7 @@ fun TopBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
         title = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal =5.dp), // เพิ่ม padding แนวนอน
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start // จัดเรียงให้อยู่ทางซ้าย
             ) {
@@ -272,7 +265,8 @@ fun TopBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
                     onValueChange = onSearchQueryChange,
                     placeholder = { Text("ค้นหา...") },
                     modifier = Modifier
-                        .fillMaxWidth(0.9f), // ใช้พื้นที่ 90% ของความกว้างทั้งหมด
+                        .width(450.dp)  // ปรับขนาดความกว้างของ TextField
+                        .padding(horizontal = 8.dp, vertical = 4.dp),  // ปรับ padding รอบ ๆ TextField
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.White,
                         focusedIndicatorColor = Color.Transparent,
@@ -284,6 +278,14 @@ fun TopBar(searchQuery: String, onSearchQueryChange: (String) -> Unit) {
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFCCFFFF)) // ตั้งค่าสีพื้นหลังเป็นสีฟ้า
     )
 }
+
+data class NewsData(
+    val title: String,
+    val admin: String,
+    val date: String,
+    val views: Int,
+    val rating: Double
+)
 
 @Composable
 fun TabRowExample() {
@@ -302,40 +304,55 @@ fun TabRowExample() {
 }
 
 @Composable
-fun NewsList(newsItems: List<String>, searchQuery: String) {
-    val filteredNewsItems = newsItems.filter { it.contains(searchQuery, ignoreCase = true) }
+fun NewsList(newsItems: List<NewsData>, searchQuery: String) {
+    val filteredNewsItems = newsItems.filter { it.title.contains(searchQuery, ignoreCase = true) }
 
     LazyColumn {
         items(filteredNewsItems) { news ->
-            NewsItem(news = news)
+            NewsItem(newsTitle = news.title, admin = news.admin, date = news.date, views = news.views, rating = news.rating)
         }
     }
 }
 
 @Composable
-fun NewsItem(news: String) {
+fun NewsItem(newsTitle: String, admin: String, date: String, views: Int, rating: Double) {
     Card(
         shape = RoundedCornerShape(8.dp), // กำหนดมุมโค้งมน
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp) // เพิ่ม padding รอบ ๆ รายการข่าว
-            .background(Color.White)
+            .background(Color(0xFFCCFFFF))
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(70.dp)
-                    .background(Color.Gray, shape = RoundedCornerShape(8.dp)) // รูปภาพมุมโค้งมน
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = news, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(text = "by Admin | 6 ชั่วโมงที่แล้ว", fontSize = 14.sp)
+            Row(
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .background(Color.Gray, shape = RoundedCornerShape(8.dp)) // รูปภาพมุมโค้งมน
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = newsTitle, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                horizontalAlignment = Alignment.Start // จัดชิดซ้าย
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "$admin | $date", fontSize = 12.sp)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(text = "อ่าน $views ครั้ง", fontSize = 12.sp)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Icon(painter = painterResource(id = R.drawable.ic_star), contentDescription = "Rating", modifier = Modifier.size(12.dp))
+                    Text(text = "$rating", fontSize = 12.sp)
+                }
             }
         }
     }
