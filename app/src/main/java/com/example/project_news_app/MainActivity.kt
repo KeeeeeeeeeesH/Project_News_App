@@ -7,9 +7,18 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+import androidx.activity.compose.setContent
+import com.example.project_news_app.ui.NewsFeedScreen
+import com.example.project_news_app.ui.theme.Project_News_AppTheme
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        supportActionBar?.hide()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContent {
+            Project_News_AppTheme {
+                NewsFeedScreen()
+            }
+        }
     }
 }
