@@ -14,6 +14,18 @@ data class LoginResponse(
     val user: MemberData?
 )
 
+data class ResetPasswordRequest(
+    val newPassword: String,
+    val confirmPassword: String
+)
+data class ResetPasswordResponse(
+    val success: Boolean,
+    val message: String?
+)
+data class PhoneNumberRequest(val phone: String)
+data class OtpRequest(val otp: String)
+data class OtpResponse(val success: Boolean, val message: String?)
+
 data class MemberData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("Mem_Fname") val memFname: String,

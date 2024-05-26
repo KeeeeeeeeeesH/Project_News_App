@@ -14,6 +14,14 @@ interface ApiService {
     @POST("api/loginMember/login")
     fun loginMember(@Body request: LoginRequest): Call<LoginResponse>
 
+    //OTP Request/Verify + ResetPassword
+    @POST("api/recovery_member/request-otp")
+    fun requestOtp(@Body phoneNumber: PhoneNumberRequest): Call<OtpResponse>
+    @POST("api/recovery_member/verify-otp")
+    fun verifyOtp(@Body otpRequest: OtpRequest): Call<OtpResponse>
+    @POST("api/reset_password_member/reset-password")
+    fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
+
     //MemberData
     @GET("api/member")
     fun getMember(): Call<List<MemberData>>
@@ -108,3 +116,4 @@ interface ApiService {
     @GET("api/news_sub_cate/{id}")
     fun getNewsSubCateByNewsId(@Path("id") newsId: Int): Call<News_Sub_CateData>
 }
+
