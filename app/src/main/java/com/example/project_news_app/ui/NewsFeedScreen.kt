@@ -184,6 +184,7 @@
 package com.example.project_news_app.ui
 
 import android.app.Activity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -205,6 +206,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 import com.example.project_news_app.R
 
 @Composable
@@ -220,8 +222,7 @@ fun ChangeStatusBarColor(color: Color) {
 }
 
 @Composable
-fun NewsFeedScreen() {
-    val navController = rememberNavController()
+fun NewsFeedScreen(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val newsItems = listOf(
         NewsData("ชื่อข่าว 1", "admin", "วันที่ วง/ดด/ปปป", 4567, 4.55),
@@ -244,7 +245,7 @@ fun NewsFeedScreen() {
         ) {
             Spacer(modifier = Modifier.height(16.dp)) // เพิ่มระยะห่างระหว่าง TextField และ TabRow
             TabRowExample()
-            NewsList(newsItems, searchQuery)
+            NewsList(newsItems, searchQuery, navController)
         }
     }
 }
@@ -304,24 +305,25 @@ fun TabRowExample() {
 }
 
 @Composable
-fun NewsList(newsItems: List<NewsData>, searchQuery: String) {
+fun NewsList(newsItems: List<NewsData>, searchQuery: String, navController: NavController) {
     val filteredNewsItems = newsItems.filter { it.title.contains(searchQuery, ignoreCase = true) }
 
     LazyColumn {
         items(filteredNewsItems) { news ->
-            NewsItem(newsTitle = news.title, admin = news.admin, date = news.date, views = news.views, rating = news.rating)
+            NewsItem(newsTitle = news.title, admin = news.admin, date = news.date, views = news.views, rating = news.rating, navController)
         }
     }
 }
 
 @Composable
-fun NewsItem(newsTitle: String, admin: String, date: String, views: Int, rating: Double) {
+fun NewsItem(newsTitle: String, admin: String, date: String, views: Int, rating: Double, navController: NavController) {
     Card(
         shape = RoundedCornerShape(8.dp), // กำหนดมุมโค้งมน
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp) // เพิ่ม padding รอบ ๆ รายการข่าว
             .background(Color(0xFFCCFFFF))
+            .clickable { navController.navigate("news_detail") } // เพิ่มการคลิกเพื่อนำทางไปยังหน้ารายละเอียดข่าว
     ) {
         Column(
             modifier = Modifier
@@ -359,24 +361,24 @@ fun NewsItem(newsTitle: String, admin: String, date: String, views: Int, rating:
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(navController: NavController) {
     NavigationBar(
         containerColor = Color(0xFFCCFFFF)
     ) {
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_star), contentDescription = "Favorites") },
+            icon = { Icon(painterResource(id = R.drawable.ic_star), contentDescription = "Favorites") },
             label = { Text("Favorites") },
             selected = false,
             onClick = { /* TODO */ }
         )
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_home), contentDescription = "Home") },
+            icon = { Icon(painterResource(id = R.drawable.ic_home), contentDescription = "Home") },
             label = { Text("Home") },
             selected = true,
             onClick = { /* TODO */ }
         )
         NavigationBarItem(
-            icon = { Icon(painter = painterResource(id = R.drawable.ic_account), contentDescription = "Profile") },
+            icon = { Icon(painterResource(id = R.drawable.ic_account), contentDescription = "Profile") },
             label = { Text("Profile") },
             selected = false,
             onClick = { /* TODO */ }
