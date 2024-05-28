@@ -3,10 +3,7 @@ package com.example.project_news_app.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,11 +13,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.project_news_app.R
-import androidx.compose.material.Icon
 
 @Composable
 fun NewsDetailScreen(navController: NavController) {
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "รายละเอียดข่าว") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { /* TODO: Handle notification click */ }) {
+                        Icon(painterResource(id = R.drawable.ic_notifications), contentDescription = "Notifications")
+                    }
+                },
+                backgroundColor = Color(0xFFCCFFFF)
+            )
+        },
         bottomBar = {
             BottomNavigationBar(navController)
         }
@@ -63,4 +75,3 @@ fun NewsDetailScreen(navController: NavController) {
         }
     }
 }
-
