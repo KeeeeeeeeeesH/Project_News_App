@@ -9,8 +9,8 @@ import java.net.CookieManager
 import java.net.CookiePolicy
 
 object RetrofitClient {
-//    private const val BASE_URL = "http://10.3.58.145:5000/"
-        private const val BASE_URL = "http://192.168.0.177:5000/"
+    private const val BASE_URL = "http://10.3.58.145:5000/"
+//        private const val BASE_URL = "http://192.168.0.177:5000/"
 
     private val cookieManager by lazy {
         CookieManager().apply {
