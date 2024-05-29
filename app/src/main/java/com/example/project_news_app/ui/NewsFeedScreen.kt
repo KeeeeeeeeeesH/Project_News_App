@@ -2,6 +2,7 @@ package com.example.project_news_app.ui
 
 import android.app.Activity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -224,26 +225,32 @@ fun BottomNavigationBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar(
-        containerColor = Color(0xFFCCFFFF)
-    ) {
-        NavigationBarItem(
-            icon = { Icon(painterResource(id = R.drawable.ic_star), contentDescription = "Favorites") },
-            label = { Text("Favorites") },
-            selected = currentRoute == "favorite_category",
-            onClick = { navController.navigate("favorite_category") }
-        )
-        NavigationBarItem(
-            icon = { Icon(painterResource(id = R.drawable.ic_home), contentDescription = "Home") },
-            label = { Text("Home") },
-            selected = currentRoute == "news_feed",
-            onClick = { navController.navigate("news_feed") }
-        )
-        NavigationBarItem(
-            icon = { Icon(painterResource(id = R.drawable.ic_account), contentDescription = "Profile") },
-            label = { Text("Profile") },
-            selected = currentRoute == "user_profile",
-            onClick = { navController.navigate("user_profile") }
-        )
+    Box(
+        modifier = Modifier
+            .border(1.dp, Color.Black) // เพิ่มขอบดำรอบๆ BottomNavigationBar
+            .fillMaxWidth()
+    ){
+        NavigationBar(
+            containerColor = Color(0xFFCCFFFF)
+        ) {
+            NavigationBarItem(
+                icon = { Icon(painterResource(id = R.drawable.ic_star), contentDescription = "Favorites") },
+                label = { Text("Favorites") },
+                selected = currentRoute == "favorite_category",
+                onClick = { navController.navigate("favorite_category") }
+            )
+            NavigationBarItem(
+                icon = { Icon(painterResource(id = R.drawable.ic_home), contentDescription = "Home") },
+                label = { Text("Home") },
+                selected = currentRoute == "news_feed",
+                onClick = { navController.navigate("news_feed") }
+            )
+            NavigationBarItem(
+                icon = { Icon(painterResource(id = R.drawable.ic_account), contentDescription = "Profile") },
+                label = { Text("Profile") },
+                selected = currentRoute == "user_profile",
+                onClick = { navController.navigate("user_profile") }
+            )
+        }
     }
 }

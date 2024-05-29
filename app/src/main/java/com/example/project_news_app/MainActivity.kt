@@ -14,6 +14,8 @@ import com.example.project_news_app.ui.FavoriteCategoryScreen
 import com.example.project_news_app.ui.CategorySelectionScreen
 import com.example.project_news_app.ui.UserProfileScreen
 import com.example.project_news_app.ui.EditUserProfileScreen
+import com.example.project_news_app.ui.ReadLaterScreen
+import com.example.project_news_app.ui.ReadHistoryScreen
 import com.example.project_news_app.ui.theme.Project_News_AppTheme
 
 class MainActivity : AppCompatActivity() {
@@ -38,5 +40,7 @@ fun MainScreen() {
         composable("category_selection") { CategorySelectionScreen(navController) }
         composable("user_profile") { UserProfileScreen(navController) }
         composable("edit_user") { EditUserProfileScreen(navController) }
+        composable("read_later") { ReadLaterScreen(navController) }
+        composable("read_history") { ReadHistoryScreen(navController) }
     }
 }

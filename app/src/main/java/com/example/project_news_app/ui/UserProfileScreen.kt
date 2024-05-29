@@ -52,12 +52,12 @@ fun UserProfileScreen(navController: NavController) {
             ProfileOption(
                 label = "อ่านภายหลัง",
                 icon = R.drawable.ic_clock,
-                onClick = { /* TODO: Implement navigation to Read Later */ }
+                onClick = { navController.navigate("read_later") }
             )
             ProfileOption(
                 label = "ประวัติการอ่าน",
                 icon = R.drawable.ic_clock,
-                onClick = { /* TODO: Implement navigation to Reading History */ }
+                onClick = { navController.navigate("read_history") }
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(
