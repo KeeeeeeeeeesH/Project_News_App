@@ -29,7 +29,7 @@
             android:id="@+id/phone_number"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="Phone Number"
+            android:hint="Phone Number "
             android:inputType="phone"
             android:layout_weight="1"
             android:background="@drawable/edit_text_background"

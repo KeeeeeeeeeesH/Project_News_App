@@ -22,43 +22,34 @@
 
         <!-- Title and Category -->
         <TextView
-            android:id="@+id/news_title"
+            android:id="@+id/news_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="หัวข้อข่าว"
+            android:text="ทดสอบหัวข้อข่าว"
             android:textSize="24sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/news_category"
+            android:id="@+id/cat_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="หมวดหมู่: กีฬา"
+            android:text="หมวดหมู่: xxx"
             android:textSize="16sp"
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/news_importance"
+            android:id="@+id/major_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ระดับความสำคัญ: ปกติ"
+            android:text="ระดับความสำคัญ: "
             android:textSize="16sp"
             android:layout_marginTop="4dp" />
 
         <TextView
-            android:id="@+id/news_date"
+            android:id="@+id/date_added"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="15 ม.ค. 2567 13:25 น."
-            android:textSize="16sp"
-            android:layout_marginTop="4dp" />
-
-        <!-- Admin, Read Count, and Rating -->
-        <TextView
-            android:id="@+id/news_admin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ผู้ดูแลระบบ"
+            android:text="วว/ดด/ปปปป xx:xx:xx"
             android:textSize="16sp"
             android:layout_marginTop="4dp" />
 
@@ -66,12 +57,12 @@
             android:id="@+id/news_read_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="อ่าน 1,000 ครั้ง"
+            android:text="อ่าน ... ครั้ง"
             android:textSize="16sp"
             android:layout_marginTop="4dp" />
 
         <TextView
-            android:id="@+id/news_rating"
+            android:id="@+id/rating_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="★ 4.5"
@@ -80,7 +71,7 @@
 
         <!-- News Image -->
         <ImageView
-            android:id="@+id/news_image"
+            android:id="@+id/news_picture"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="16dp"
@@ -88,19 +79,19 @@
 
         <!-- News Content -->
         <TextView
-            android:id="@+id/news_content"
+            android:id="@+id/news_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="เนื้อหาข่าวสาร เนื้อหาข่าวสาร"
+            android:text="ทดสอบ เนื้อหาข่าว"
             android:textSize="16sp"
             android:layout_marginTop="16dp" />
 
         <!-- Tags -->
         <TextView
-            android:id="@+id/news_tags"
+            android:id="@+id/news_sub_category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="แท็กข่าว: ฟุตบอล, นักฟุตบอล, กีฬา"
+            android:text="แท็กข่าว: xxx xxx xxx"
             android:textSize="16sp"
             android:layout_marginTop="8dp" />
 

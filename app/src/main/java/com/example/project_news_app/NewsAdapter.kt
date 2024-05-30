@@ -1,15 +1,20 @@
-package com.example.project_news_app
+package com.example.project_news_app.adapters
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.project_news_app.NewsData
+import com.example.project_news_app.R
 
-class NewsAdapter(private val newsList: List<News>) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+
+    fun setNews(newList: List<NewsData>) {
+        newsList = newList
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false)
@@ -17,44 +22,20 @@ class NewsAdapter(private val newsList: List<News>) : RecyclerView.Adapter<NewsA
     }
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
-        val currentItem = newsList[position]
-        holder.newsTitle.text = currentItem.title
-        holder.newsAdmin.text = currentItem.admin
-        holder.newsDate.text = currentItem.date
-        holder.newsReadCount.text = currentItem.readCount
-        holder.newsRating.text = currentItem.rating
-
-        // Set onClickListener to navigate to NewsDetailActivity when the card is clicked
-        holder.newsItemLayout.setOnClickListener {
-            val context = holder.itemView.context
-            val intent = Intent(context, NewsDetailActivity::class.java).apply {
-                putExtra("news_title", currentItem.title)
-                putExtra("news_admin", currentItem.admin)
-                putExtra("news_date", currentItem.date)
-                putExtra("news_read_count", currentItem.readCount)
-                putExtra("news_rating", currentItem.rating)
-            }
-            context.startActivity(intent)
-        }
+        val news = newsList[position]
+        holder.newsName.text = news.newsName
+        holder.newsDate.text = news.dateAdded.toString()
+        holder.newsReadCount.text = "อ่าน ${news.readCount} ครั้ง"
+        holder.newsRating.text = "★ ${news.ratingScore}"
     }
 
     override fun getItemCount() = newsList.size
 
     class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val newsItemLayout: LinearLayout = itemView.findViewById(R.id.news_item_layout)
-        val newsImage: ImageView = itemView.findViewById(R.id.news_image)
-        val newsTitle: TextView = itemView.findViewById(R.id.news_title)
-        val newsAdmin: TextView = itemView.findViewById(R.id.news_admin)
+        val newsPicture: ImageView = itemView.findViewById(R.id.news_picture)
+        val newsName: TextView = itemView.findViewById(R.id.news_name)
         val newsDate: TextView = itemView.findViewById(R.id.news_date)
         val newsReadCount: TextView = itemView.findViewById(R.id.news_read_count)
         val newsRating: TextView = itemView.findViewById(R.id.news_rating)
     }
 }
-
-data class News(
-    val title: String,
-    val admin: String,
-    val date: String,
-    val readCount: String,
-    val rating: String
-)

@@ -1,93 +1,119 @@
 package com.example.project_news_app
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.HorizontalScrollView
+import com.example.project_news_app.adapters.NewsAdapter
+import com.example.project_news_app.adapters.CategoryAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import android.content.Intent
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
-    private var isCategoriesExpanded: Boolean = false
+    private lateinit var searchBar: EditText
+    private lateinit var searchButton: ImageButton
+    private lateinit var toggleCategories: ImageButton
+    private lateinit var categoriesRecyclerView: RecyclerView
+    private lateinit var newsRecyclerView: RecyclerView
+    private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var newsAdapter: NewsAdapter
+    private lateinit var categoryAdapter: CategoryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toggleButton: ImageButton = findViewById(R.id.toggle_categories)
-        val subCategoriesScrollView: HorizontalScrollView = findViewById(R.id.subcategories_scroll_view)
-        val subCategoriesRecyclerView: RecyclerView = findViewById(R.id.subcategories_recycler_view)
+        searchBar = findViewById(R.id.search_bar)
+        searchButton = findViewById(R.id.search_button)
+        toggleCategories = findViewById(R.id.toggle_categories)
+        categoriesRecyclerView = findViewById(R.id.categories_recycler_view)
+        newsRecyclerView = findViewById(R.id.news_recycler_view)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
 
-        toggleButton.setOnClickListener {
-            isCategoriesExpanded = !isCategoriesExpanded
-            updateToggleButton(subCategoriesScrollView)
-        }
-
-        // Categories RecyclerView
-        val categoriesRecyclerView: RecyclerView = findViewById(R.id.categories_recycler_view)
         categoriesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        categoriesRecyclerView.adapter = CategoryAdapter(getCategoryList())
-
-        // Subcategories RecyclerView
-        subCategoriesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        subCategoriesRecyclerView.adapter = SubCategoryAdapter(getSubCategoryList())
-
-        // News RecyclerView
-        val newsRecyclerView: RecyclerView = findViewById(R.id.news_recycler_view)
         newsRecyclerView.layoutManager = LinearLayoutManager(this)
-        newsRecyclerView.adapter = NewsAdapter(getNewsList())
 
-        // Bottom Navigation
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_favorites -> {
+        categoryAdapter = CategoryAdapter()
+        newsAdapter = NewsAdapter(listOf())
+
+        categoriesRecyclerView.adapter = categoryAdapter
+        newsRecyclerView.adapter = newsAdapter
+
+        loadCategories()
+        loadNews()
+
+        bottomNavigation.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navigation_home -> {
+                    // Handle Home tab click
                     true
                 }
-                R.id.navigation_home -> {
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
+                R.id.navigation_favorite -> {
+                    // Handle Favorite tab click
+                    startActivity(Intent(this, FavoriteActivity::class.java))
                     true
                 }
                 R.id.navigation_profile -> {
-                    // Handle Profile action
+                    // Handle Profile tab click
+                    startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
                 else -> false
             }
         }
-    }
 
-    private fun updateToggleButton(subCategoriesScrollView: HorizontalScrollView) {
-        val toggleButton: ImageButton = findViewById(R.id.toggle_categories)
-        if (isCategoriesExpanded) {
-            toggleButton.setImageResource(R.drawable.ic_arrow_up)
-            subCategoriesScrollView.visibility = View.VISIBLE
-        } else {
-            toggleButton.setImageResource(R.drawable.ic_arrow_down)
-            subCategoriesScrollView.visibility = View.GONE
+        toggleCategories.setOnClickListener {
+            onToggleCategoriesClick()
+        }
+
+        searchButton.setOnClickListener {
+            // Handle search click
         }
     }
 
-    private fun getCategoryList(): List<String> {
-        return listOf("แนะนำ", "เทคโนโลยี", "เกม", "สุขภาพ", "ท่องเที่ยว")
+    private fun onToggleCategoriesClick() {
+        // Logic to handle the toggle categories click
     }
 
-    private fun getSubCategoryList(): List<String> {
-        return listOf("Sub1", "Sub2", "Sub3", "Sub4", "Sub5")
+    private fun loadCategories() {
+        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
+            override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
+                if (response.isSuccessful) {
+                    categoryAdapter.setCategories(response.body() ?: listOf())
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load categories", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<CategoryData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
-    private fun getNewsList(): List<News> {
-        return listOf(
-            News("ชื่อข่าว 1", "admin", "วันที่ วง/ดด/ปปปป", "อ่าน 4,567 ครั้ง", "★ 4.55"),
-            News("ชื่อข่าว 2", "admin", "วันที่ วง/ดด/ปปปป", "อ่าน 3,456 ครั้ง", "★ 4.50"),
-            News("ชื่อข่าว 3", "admin", "วันที่ วง/ดด/ปปปป", "อ่าน 2,345 ครั้ง", "★ 4.45"),
-            News("ชื่อข่าว 4", "admin", "วันที่ วง/ดด/ปปปป", "อ่าน 1,234 ครั้ง", "★ 4.40"),
-            News("ชื่อข่าว 5", "admin", "วันที่ วง/ดด/ปปปป", "อ่าน 567 ครั้ง", "★ 4.35")
-        )
+    private fun loadNews() {
+        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        apiService.getNews().enqueue(object : Callback<List<NewsData>> {
+            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
+                if (response.isSuccessful) {
+                    val newsList = response.body() ?: listOf()
+                    newsAdapter.setNews(newsList)
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

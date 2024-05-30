@@ -25,9 +25,16 @@
             android:hint="ค้นหา..."
             android:padding="10dp"
             android:background="@color/white"
-            android:drawableEnd="@drawable/ic_search"
             android:minHeight="48dp"
             android:minWidth="48dp"/>
+
+        <ImageButton
+            android:id="@+id/search_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_search"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Search"/>
     </LinearLayout>
 
     <!-- Categories -->
@@ -50,37 +57,13 @@
 
         <ImageButton
             android:id="@+id/toggle_categories"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:padding="10dp"
             android:src="@drawable/ic_arrow_down"
             android:background="?android:attr/selectableItemBackground"
-            android:onClick="onToggleCategoriesClick"/>
+            android:contentDescription="Toggle Categories"/>
     </LinearLayout>
-
-    <!-- Subcategories -->
-    <HorizontalScrollView
-        android:id="@+id/subcategories_scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/categories_container"
-        android:visibility="gone"
-        android:background="@color/white"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/subcategories_recycler_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                tools:listitem="@layout/item_category"/>
-        </LinearLayout>
-    </HorizontalScrollView>
 
     <!-- News List -->
     <androidx.recyclerview.widget.RecyclerView
@@ -88,7 +71,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_above="@id/bottom_navigation"
-        android:layout_below="@id/subcategories_scroll_view"
         android:padding="10dp"
         tools:listitem="@layout/item_news"/>
 

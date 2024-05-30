@@ -59,7 +59,9 @@ data class NewsData(
     @SerializedName("News_Details") val newsDetails: String,
     @SerializedName("Date_Added") val dateAdded: Date,
     @SerializedName("Cat_Id") val catId: Int,
-    @SerializedName("Major_Id") val majorId: Int
+    @SerializedName("Major_Id") val majorId: Int,
+    @SerializedName("Read_Count") val readCount: Int,
+    @SerializedName("Rating_Score") val ratingScore: Float
 )
 
 data class PictureData(
