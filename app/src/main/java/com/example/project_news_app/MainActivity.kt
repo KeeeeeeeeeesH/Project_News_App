@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.HorizontalScrollView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,11 +46,11 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_favorites -> {
-                    // Handle Favorites action
                     true
                 }
                 R.id.navigation_home -> {
-                    // Handle Home action
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
                     true
                 }
                 R.id.navigation_profile -> {
