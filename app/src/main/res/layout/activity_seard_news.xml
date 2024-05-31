@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#E0FFFF"
+    tools:context=".SearchNewsScreen">
+
+    <TextView
+        android:id="@+id/tvSearchTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ค้นหาข่าว"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+    <LinearLayout
+        android:id="@+id/llSearchByTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/tvSearchTitle"
+        android:layout_marginTop="40dp"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvSearchByTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ชื่อข่าว"
+            android:textSize="18sp"
+            android:layout_marginRight="8dp"/>
+
+        <EditText
+            android:id="@+id/etSearchTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="กรอกชื่อหรือหัวข้อข่าว"
+            android:textSize="18sp"
+            android:background="#DDDDDD"
+            android:padding="12dp"/>
+
+        <Button
+            android:id="@+id/btnSearchTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ค้นหา"
+            android:backgroundTint="#CCCCCC"
+            android:textColor="#000000"
+            android:layout_marginLeft="8dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llSearchByDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/llSearchByTitle"
+        android:layout_marginTop="20dp"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvSearchByDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="วันที่"
+            android:textSize="18sp"
+            android:layout_marginRight="8dp"/>
+
+        <EditText
+            android:id="@+id/etSearchDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="เลือกวันที่"
+            android:textSize="18sp"
+            android:background="#DDDDDD"
+            android:padding="12dp"
+            android:drawableRight="@android:drawable/ic_menu_my_calendar"/>
+
+        <Button
+            android:id="@+id/btnSearchDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ค้นหา"
+            android:backgroundTint="#CCCCCC"
+            android:textColor="#000000"
+            android:layout_marginLeft="8dp"/>
+    </LinearLayout>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation_menu"
+        android:background="#E0FFFF"/>
+
+</RelativeLayout>

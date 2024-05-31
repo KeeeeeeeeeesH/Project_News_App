@@ -69,6 +69,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // Set initial selected item
+        bottomNavigation.selectedItemId = R.id.navigation_home
+
         toggleCategories.setOnClickListener {
             onToggleCategoriesClick()
         }

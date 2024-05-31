@@ -28,5 +28,8 @@ class ProfileActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        // Set the selected item as profile
+        bottomNavigation.selectedItemId = R.id.navigation_profile
     }
 }
