@@ -36,18 +36,6 @@ interface ApiService {
     @GET("api/category/{id}")
     fun getCategoryById(@Path("id") catId: Int): Call<CategoryData>
 
-    //Sub_CategoryData
-    @GET("api/sub_category")
-    fun getSubcategory(): Call<List<Sub_CategoryData>>
-    @GET("api/sub_category/{id}")
-    fun getSubCategoryById(@Path("id") subCatId: Int): Call<Sub_CategoryData>
-
-    //MajorData
-    @GET("api/major")
-    fun getMajor(): Call<List<MajorData>>
-    @GET("api/major/{id}")
-    fun getMajorById(@Path("id") majorId: Int): Call<MajorData>
-
     //NewsData
     @GET("api/news")
     fun getNews(): Call<List<NewsData>>
@@ -61,6 +49,37 @@ interface ApiService {
     fun getPicture(): Call<List<PictureData>>
     @GET("api/picture/{id}")
     fun getPictureByNewsId(@Path("id") newsId: Int): Call<PictureData>
+
+    //News_RatingData
+
+    @GET("api/news_rating")
+    fun getNewsRating(): Call<List<News_RatingData>>
+    @GET("api/news_rating/{id}")
+    fun getNewsRatingByNewsId(@Path("id") newsId: Int): Call<News_RatingData>
+    @POST("api/news_rating")
+    fun postNewsRating(@Body newsRating: News_RatingData): Call<News_RatingData>
+    @PUT("api/news_rating/{id}")
+    fun putNewsRatingByMemId(@Path("id") memId: Int, @Body newsRating: News_RatingData): Call<News_RatingData>
+
+    //Total_ReadData
+    @GET("api/total_read")
+    fun getTotalRead(): Call<List<Total_ReadData>>
+    @GET("api/total_read/{id}")
+    fun getTotalReadById(@Path("id") countId: Int): Call<Total_ReadData>
+    @POST("api/total_read")
+    fun postTotalRead(@Body totalRead: Total_ReadData): Call<Total_ReadData>
+
+    //Sub_CategoryData
+    @GET("api/sub_category")
+    fun getSubcategory(): Call<List<Sub_CategoryData>>
+    @GET("api/sub_category/{id}")
+    fun getSubCategoryById(@Path("id") subCatId: Int): Call<Sub_CategoryData>
+
+    //MajorData
+    @GET("api/major")
+    fun getMajor(): Call<List<MajorData>>
+    @GET("api/major/{id}")
+    fun getMajorById(@Path("id") majorId: Int): Call<MajorData>
 
     //Favorite_CategoryData
     @GET("api/favorite_category")
@@ -82,16 +101,6 @@ interface ApiService {
     @DELETE("api/read_later/{id}")
     fun deleteReadLater(@Path("id") memId: Int): Call<Void>
 
-    //News_RatingData
-    @GET("api/news_rating")
-    fun getNewsRating(): Call<List<News_RatingData>>
-    @GET("api/news_rating/{id}")
-    fun getNewsRatingByNewsId(@Path("id") newsId: Int): Call<News_RatingData>
-    @POST("api/news_rating")
-    fun postNewsRating(@Body newsRating: News_RatingData): Call<News_RatingData>
-    @PUT("api/news_rating/{id}")
-    fun putNewsRatingByMemId(@Path("id") memId: Int, @Body newsRating: News_RatingData): Call<News_RatingData>
-
     //Read_HistoryData
     @GET("api/read_history")
     fun getReadHistory(): Call<List<Read_HistoryData>>
@@ -104,13 +113,6 @@ interface ApiService {
     @DELETE("api/read_history/{id}")
     fun deleteReadHistory(@Path("id") memId: Int): Call<Void>
 
-    //Total_ReadData
-    @GET("api/total_read")
-    fun getTotalRead(): Call<List<Total_ReadData>>
-    @GET("api/total_read/{id}")
-    fun getTotalReadById(@Path("id") countId: Int): Call<Total_ReadData>
-    @POST("api/total_read")
-    fun postTotalRead(@Body totalRead: Total_ReadData): Call<Total_ReadData>
 
     //News_Sub_CateData
     @GET("api/news_sub_cate")

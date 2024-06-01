@@ -1,15 +1,16 @@
 package com.example.project_news_app
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.project_news_app.adapters.NewsAdapter
 import com.example.project_news_app.adapters.CategoryAdapter
+import com.example.project_news_app.adapters.NewsAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,6 +27,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var categoryAdapter: CategoryAdapter
 
+    private var selectedCategoryId: Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,7 +43,11 @@ class MainActivity : AppCompatActivity() {
         categoriesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         newsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        categoryAdapter = CategoryAdapter()
+        categoryAdapter = CategoryAdapter { category ->
+            selectedCategoryId = category.catId
+            categoryAdapter.setSelectedCategory(category.catId)
+            loadNewsByCategory(category.catId)
+        }
         newsAdapter = NewsAdapter(listOf())
 
         categoriesRecyclerView.adapter = categoryAdapter
@@ -51,17 +58,12 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_home -> {
-                    // Handle Home tab click
-                    true
-                }
+                R.id.navigation_home -> true
                 R.id.navigation_favorite -> {
-                    // Handle Favorite tab click
                     startActivity(Intent(this, FavoriteActivity::class.java))
                     true
                 }
                 R.id.navigation_profile -> {
-                    // Handle Profile tab click
                     startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
@@ -69,7 +71,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Set initial selected item
         bottomNavigation.selectedItemId = R.id.navigation_home
 
         toggleCategories.setOnClickListener {
@@ -108,13 +109,80 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body() ?: listOf()
-                    newsAdapter.setNews(newsList)
+                    fetchReadCounts(newsList)
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun loadNewsByCategory(categoryId: Int) {
+        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        apiService.getNewsByCategory(categoryId).enqueue(object : Callback<List<NewsData>> {
+            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
+                if (response.isSuccessful) {
+                    val newsList = response.body() ?: listOf()
+                    fetchReadCounts(newsList)
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun fetchReadCounts(newsList: List<NewsData>) {
+        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+
+        apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
+            override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
+                if (response.isSuccessful) {
+                    val readCounts = response.body() ?: listOf()
+                    newsList.forEach { news ->
+                        news.readCount = readCounts.count { it.newsId == news.newsId }
+                    }
+                    fetchRatings(newsList)
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun fetchRatings(newsList: List<NewsData>) {
+        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+
+        apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
+            override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
+                if (response.isSuccessful) {
+                    val ratings = response.body() ?: listOf()
+                    newsList.forEach { news ->
+                        val newsRatings = ratings.filter { it.newsId == news.newsId }
+                        news.ratingScore = if (newsRatings.isNotEmpty()) {
+                            newsRatings.sumByDouble { it.ratingScore.toDouble() }.toFloat() / newsRatings.size
+                        } else {
+                            0f
+                        }
+                    }
+                    newsAdapter.setNews(newsList)
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
