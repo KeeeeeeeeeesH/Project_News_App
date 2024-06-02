@@ -27,7 +27,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var categoryAdapter: CategoryAdapter
 
-    private var selectedCategoryId: Int? = null
+    private var currentCategoryId: Int = 0 // Default to "แนะนำ"
+    private var currentPage: Int = 0 // Page index for loading more news
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         newsRecyclerView.layoutManager = LinearLayoutManager(this)
 
         categoryAdapter = CategoryAdapter { category ->
-            selectedCategoryId = category.catId
+            currentCategoryId = category.catId
             categoryAdapter.setSelectedCategory(category.catId)
             loadNewsByCategory(category.catId)
         }
@@ -54,11 +55,15 @@ class MainActivity : AppCompatActivity() {
         newsRecyclerView.adapter = newsAdapter
 
         loadCategories()
-        loadNews()
+        loadNewsByCategory(currentCategoryId)
 
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.navigation_home -> true
+                R.id.navigation_home -> {
+                    currentCategoryId = 0
+                    loadNewsByCategory(currentCategoryId)
+                    true
+                }
                 R.id.navigation_favorite -> {
                     startActivity(Intent(this, FavoriteActivity::class.java))
                     true
@@ -80,6 +85,14 @@ class MainActivity : AppCompatActivity() {
         searchButton.setOnClickListener {
             // Handle search click
         }
+
+        newsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (!recyclerView.canScrollVertically(1)) {
+                    loadMoreNews()
+                }
+            }
+        })
     }
 
     private fun onToggleCategoriesClick() {
@@ -91,7 +104,9 @@ class MainActivity : AppCompatActivity() {
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
                 if (response.isSuccessful) {
-                    categoryAdapter.setCategories(response.body() ?: listOf())
+                    val categories = response.body() ?: listOf()
+                    val allCategories = listOf(CategoryData(0, "แนะนำ")) + categories
+                    categoryAdapter.setCategories(allCategories)
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load categories", Toast.LENGTH_SHORT).show()
                 }
@@ -103,31 +118,24 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun loadNews() {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
-        apiService.getNews().enqueue(object : Callback<List<NewsData>> {
-            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
-                if (response.isSuccessful) {
-                    val newsList = response.body() ?: listOf()
-                    fetchReadCounts(newsList)
-                } else {
-                    Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+    private fun loadNewsByCategory(catId: Int) {
+        currentPage = 0
+        loadMoreNews()
     }
 
-    private fun loadNewsByCategory(categoryId: Int) {
+    private fun loadMoreNews() {
         val apiService = RetrofitClient.instance.create(ApiService::class.java)
-        apiService.getNewsByCategory(categoryId).enqueue(object : Callback<List<NewsData>> {
+        apiService.getNewsByCategoryPaged(currentCategoryId, currentPage, 5).enqueue(object : Callback<List<NewsData>> {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body() ?: listOf()
+                    if (currentPage == 0) {
+                        newsAdapter.setNews(newsList)
+                    } else {
+                        newsAdapter.addNews(newsList)
+                    }
                     fetchReadCounts(newsList)
+                    currentPage++
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
                 }
@@ -176,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                             0f
                         }
                     }
-                    newsAdapter.setNews(newsList)
+                    newsAdapter.notifyDataSetChanged()
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
                 }
@@ -188,3 +196,4 @@ class MainActivity : AppCompatActivity() {
         })
     }
 }
+

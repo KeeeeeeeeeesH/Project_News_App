@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -41,6 +42,12 @@ interface ApiService {
     fun getNews(): Call<List<NewsData>>
     @GET("api/news/category/{id}")
     fun getNewsByCategory(@Path("id") catId: Int): Call<List<NewsData>>
+    @GET("api/news/category/{id}")
+    fun getNewsByCategoryPaged(
+        @Path("id") catId: Int,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int
+    ): Call<List<NewsData>>
     @GET("api/news/{id}")
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
 
@@ -51,7 +58,6 @@ interface ApiService {
     fun getPictureByNewsId(@Path("id") newsId: Int): Call<PictureData>
 
     //News_RatingData
-
     @GET("api/news_rating")
     fun getNewsRating(): Call<List<News_RatingData>>
     @GET("api/news_rating/{id}")

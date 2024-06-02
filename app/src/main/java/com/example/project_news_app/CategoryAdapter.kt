@@ -9,18 +9,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.project_news_app.CategoryData
 import com.example.project_news_app.R
 
-class CategoryAdapter(private val onCategoryClick: (CategoryData) -> Unit) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
+class CategoryAdapter(
+    private val onCategoryClick: (CategoryData) -> Unit
+) : RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder>() {
 
     private var categories = listOf<CategoryData>()
-    private var selectedCategoryId: Int? = null
+    private var selectedCategoryId: Int = 0
 
     fun setCategories(newCategories: List<CategoryData>) {
         categories = newCategories
         notifyDataSetChanged()
     }
 
-    fun setSelectedCategory(categoryId: Int) {
-        selectedCategoryId = categoryId
+    fun setSelectedCategory(catId: Int) {
+        selectedCategoryId = catId
         notifyDataSetChanged()
     }
 
@@ -32,12 +34,12 @@ class CategoryAdapter(private val onCategoryClick: (CategoryData) -> Unit) : Rec
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = categories[position]
         holder.categoryName.text = category.catName
-        holder.itemView.setOnClickListener {
-            onCategoryClick(category)
-        }
         holder.categoryName.setTextColor(
             if (category.catId == selectedCategoryId) Color.RED else Color.BLACK
         )
+        holder.itemView.setOnClickListener {
+            onCategoryClick(category)
+        }
     }
 
     override fun getItemCount() = categories.size

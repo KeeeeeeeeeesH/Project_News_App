@@ -17,6 +17,12 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
         newsList = newList
         notifyDataSetChanged()
     }
+    fun addNews(news: List<NewsData>) {
+        val currentList = ArrayList(this.newsList)
+        currentList.addAll(news)
+        this.newsList = currentList
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false)
