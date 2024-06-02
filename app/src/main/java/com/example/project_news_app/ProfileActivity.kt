@@ -33,7 +33,6 @@
 //        bottomNavigation.selectedItemId = R.id.navigation_profile
 //    }
 //}
-
 package com.example.project_news_app
 
 import android.content.Context
@@ -62,8 +61,9 @@ class ProfileActivity : AppCompatActivity() {
             editor.clear()
             editor.apply()
 
-            // Navigate back to login activity
+            // Navigate back to login activity and clear the back stack
             val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
         }
