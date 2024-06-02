@@ -11,7 +11,9 @@ data class LoginRequest(
 data class LoginResponse(
     val success: Boolean,
     val message: String?,
-    val user: MemberData?
+    val user: MemberData?,
+    val userId: String
+
 )
 
 data class ResetPasswordRequest(
