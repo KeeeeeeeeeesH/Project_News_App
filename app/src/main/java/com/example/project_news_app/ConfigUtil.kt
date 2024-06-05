@@ -1,3 +1,5 @@
+package com.example.project_news_app
+
 import android.content.Context
 import org.json.JSONObject
 import java.io.IOException
@@ -11,7 +13,7 @@ object ConfigUtil {
             jsonObject.getString("baseUrl")
         } catch (e: IOException) {
             e.printStackTrace()
-            ""
+            "http://localhost:5000/"
         }
     }
 }

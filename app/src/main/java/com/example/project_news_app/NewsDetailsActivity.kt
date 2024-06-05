@@ -42,7 +42,7 @@ class NewsDetailsActivity : AppCompatActivity() {
     }
 
     private fun fetchNewsDetails(newsId: Int) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getNewsById(newsId).enqueue(object : Callback<NewsData> {
             override fun onResponse(call: Call<NewsData>, response: Response<NewsData>) {
                 if (response.isSuccessful) {

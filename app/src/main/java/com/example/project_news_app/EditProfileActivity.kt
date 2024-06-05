@@ -57,7 +57,7 @@ class EditProfileActivity : AppCompatActivity() {
             } else {
                 // Update user data
                 val memId = sharedPreferences.getInt("memId", 0)
-                val apiService = RetrofitClient.instance.create(ApiService::class.java)
+                val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
                 val memberData = MemberData(
                     memId = memId,
                     memFname = newFname,

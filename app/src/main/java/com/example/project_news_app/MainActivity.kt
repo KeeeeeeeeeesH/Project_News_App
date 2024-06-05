@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadCategories() {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
                 if (response.isSuccessful) {
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadMoreNews() {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getNewsByCategoryPaged(currentCategoryId, currentPage, 5).enqueue(object : Callback<List<NewsData>> {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchReadCounts(newsList: List<NewsData>) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
         apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
             override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchRatings(newsList: List<NewsData>) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
         apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
             override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchCoverImages(newsList: List<NewsData>) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
         newsList.forEach { news ->
             apiService.getCoverImage(news.newsId).enqueue(object : Callback<List<PictureData>> {
@@ -205,9 +205,7 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val pictures = response.body() ?: listOf()
                         val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
-
-                        news.coverImageUrl = coverImage?.let { "http://10.3.58.145:5000/uploads/${it.pictureName}" }
-
+                        news.coverImageUrl = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
                         Log.d("MainActivity", "Cover Image URL: ${news.coverImageUrl}")
                         newsAdapter.notifyDataSetChanged()
                     } else {
@@ -221,6 +219,4 @@ class MainActivity : AppCompatActivity() {
             })
         }
     }
-
 }
-

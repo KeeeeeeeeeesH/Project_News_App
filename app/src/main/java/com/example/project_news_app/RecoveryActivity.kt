@@ -51,7 +51,7 @@ class RecoveryActivity : AppCompatActivity() {
     }
 
     private fun requestOtp(phoneNumber: String) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = PhoneNumberRequest(phone = phoneNumber)
 
         apiService.requestOtp(request).enqueue(object : Callback<OtpResponse> {
@@ -72,7 +72,7 @@ class RecoveryActivity : AppCompatActivity() {
     }
 
     private fun verifyOtp(otp: String) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = OtpRequest(otp = otp)
 
         apiService.verifyOtp(request).enqueue(object : Callback<OtpResponse> {

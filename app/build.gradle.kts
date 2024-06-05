@@ -152,7 +152,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.squareup.okhttp3:okhttp-urlconnection:4.9.3")
 
-    //bumptech imageloading
+    //bumptech image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
 

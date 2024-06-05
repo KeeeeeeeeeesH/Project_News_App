@@ -40,7 +40,7 @@ class ResetPasswordActivity : AppCompatActivity() {
     }
 
     private fun resetPassword(newPassword: String, confirmPassword: String) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = ResetPasswordRequest(newPassword, confirmPassword)
 
         apiService.resetPassword(request).enqueue(object : Callback<ResetPasswordResponse> {

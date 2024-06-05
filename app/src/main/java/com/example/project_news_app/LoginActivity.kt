@@ -146,7 +146,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginMember(username: String, password: String) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val loginRequest = LoginRequest(login = username, password = password)
 
         apiService.loginMember(loginRequest).enqueue(object : Callback<LoginResponse> {

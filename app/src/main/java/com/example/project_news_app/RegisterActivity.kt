@@ -55,7 +55,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun registerMember(firstName: String, lastName: String, phoneNumber: String, email: String, username: String, password: String) {
-        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val memberData = MemberData(
             memId = 0,
             memFname = firstName,

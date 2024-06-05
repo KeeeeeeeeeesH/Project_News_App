@@ -44,7 +44,7 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
 
         holder.newsDate.text = formattedDate
         holder.newsReadCount.text = "อ่าน ${news.readCount} ครั้ง"
-        holder.newsRating.text = "★ ${news.ratingScore}"
+        holder.newsRating.text = String.format("★ %.2f", news.ratingScore)
 
         // Load cover image if available
         if (news.coverImageUrl != null) {
@@ -65,4 +65,3 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
         val newsRating: TextView = itemView.findViewById(R.id.rating_score)
     }
 }
-
