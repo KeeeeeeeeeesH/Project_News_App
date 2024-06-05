@@ -28,32 +28,37 @@
         android:padding="16dp">
 
         <Button
-            android:layout_width="wrap_content"
+            android:id="@+id/editProfileButton"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="แก้ไขข้อมูลส่วนตัว"
             android:layout_marginTop="20dp"
-            android:drawableLeft="@drawable/ic_edit"/>
+            android:drawableLeft="@drawable/ic_edit"
+            android:layout_weight="1"/>
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="อ่านภายหลัง"
             android:layout_marginTop="20dp"
-            android:drawableLeft="@drawable/ic_star"/>
+            android:drawableLeft="@drawable/ic_star"
+            android:layout_weight="1"/>
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="ประวัติการอ่าน"
             android:layout_marginTop="20dp"
-            android:drawableLeft="@drawable/ic_star"/>
+            android:drawableLeft="@drawable/ic_star"
+            android:layout_weight="1"/>
 
         <Button
             android:id="@+id/logout_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="ออกจากระบบ"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"/>
     </LinearLayout>
 
     <!-- Bottom Navigation -->

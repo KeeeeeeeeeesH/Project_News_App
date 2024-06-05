@@ -33,6 +33,7 @@
 //        bottomNavigation.selectedItemId = R.id.navigation_profile
 //    }
 //}
+
 package com.example.project_news_app
 
 import android.content.Context
@@ -40,6 +41,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -54,6 +56,18 @@ class ProfileActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
+
+        val memId = sharedPreferences.getInt("memId", 0)
+        val fname = sharedPreferences.getString("fname", "")
+        val lname = sharedPreferences.getString("lname", "")
+        val welcomeTextView = findViewById<TextView>(R.id.member_name)
+        welcomeTextView.text = "$fname $lname!"
+
+        val editProfileButton = findViewById<Button>(R.id.editProfileButton)
+        editProfileButton.setOnClickListener {
+            val intent = Intent(this, EditProfileActivity::class.java)
+            startActivityForResult(intent, 1)
+        }
 
         val logoutButton = findViewById<Button>(R.id.logout_button)
         logoutButton.setOnClickListener {
@@ -89,5 +103,16 @@ class ProfileActivity : AppCompatActivity() {
 
         // Set the selected item as profile
         bottomNavigation.selectedItemId = R.id.navigation_profile
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Refresh data
+            val fname = sharedPreferences.getString("fname", "")
+            val lname = sharedPreferences.getString("lname", "")
+            val welcomeTextView = findViewById<TextView>(R.id.member_name)
+            welcomeTextView.text = "$fname $lname!"
+        }
     }
 }
