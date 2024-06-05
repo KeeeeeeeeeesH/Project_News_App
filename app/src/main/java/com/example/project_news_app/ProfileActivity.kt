@@ -63,6 +63,12 @@ class ProfileActivity : AppCompatActivity() {
         val welcomeTextView = findViewById<TextView>(R.id.member_name)
         welcomeTextView.text = "$fname $lname!"
 
+        val editProfileButton = findViewById<Button>(R.id.editProfileButton)
+        editProfileButton.setOnClickListener {
+            val intent = Intent(this, EditProfileActivity::class.java)
+            startActivityForResult(intent, 1)
+        }
+
         val logoutButton = findViewById<Button>(R.id.logout_button)
         logoutButton.setOnClickListener {
             // Clear login status
@@ -97,5 +103,16 @@ class ProfileActivity : AppCompatActivity() {
 
         // Set the selected item as profile
         bottomNavigation.selectedItemId = R.id.navigation_profile
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Refresh data
+            val fname = sharedPreferences.getString("fname", "")
+            val lname = sharedPreferences.getString("lname", "")
+            val welcomeTextView = findViewById<TextView>(R.id.member_name)
+            welcomeTextView.text = "$fname $lname!"
+        }
     }
 }

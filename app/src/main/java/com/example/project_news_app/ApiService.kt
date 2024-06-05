@@ -30,6 +30,9 @@ interface ApiService {
     fun getMemberById(@Path("id") memId: Int): Call<MemberData>
     @POST("api/member")
     fun postMember(@Body member: MemberData): Call<MemberData>
+    @PUT("api/member/{id}")
+    fun updateMember(@Path("id") memId: Int, @Body memberData: MemberData): Call<MemberData>
+
 
     //CategoryData
     @GET("api/category")
