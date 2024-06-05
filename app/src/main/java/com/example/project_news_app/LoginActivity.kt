@@ -154,11 +154,14 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
                     if (loginResponse?.success == true) {
-                        // Save login status and user ID in SharedPreferences
+                        // Save login status and user details in SharedPreferences
                         editor.putBoolean("isLoggedIn", true)
-                        editor.putString("userId", loginResponse.userId) // Ensure userId is available in LoginResponse
+                        editor.putInt("memId", loginResponse.user?.memId ?: 0)
+                        editor.putString("fname", loginResponse.user?.memFname)
+                        editor.putString("lname", loginResponse.user?.memLname)
                         editor.apply()
 
+                        // Pass fname and lname to ProfileActivity
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
                         startActivity(intent)
                         finish()
@@ -175,4 +178,3 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 }
-
