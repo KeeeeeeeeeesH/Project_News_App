@@ -46,16 +46,15 @@ interface ApiService {
     fun getNewsByCategoryPaged(
         @Path("id") catId: Int,
         @Query("page") page: Int,
-        @Query("limit") limit: Int
-    ): Call<List<NewsData>>
+        @Query("limit") limit: Int): Call<List<NewsData>>
     @GET("api/news/{id}")
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
 
     //PictureData
     @GET("api/picture")
     fun getPicture(): Call<List<PictureData>>
-    @GET("api/picture/{id}")
-    fun getPictureByNewsId(@Path("id") newsId: Int): Call<PictureData>
+    @GET("api/picture/news/{newsId}")
+    fun getCoverImage(@Path("newsId") newsId: Int): Call<List<PictureData>>
 
     //News_RatingData
     @GET("api/news_rating")
@@ -118,7 +117,6 @@ interface ApiService {
     fun putReadHistoryByMemId(@Path("id") memId: Int, @Body readHistory: Read_HistoryData): Call<Read_HistoryData>
     @DELETE("api/read_history/{id}")
     fun deleteReadHistory(@Path("id") memId: Int): Call<Void>
-
 
     //News_Sub_CateData
     @GET("api/news_sub_cate")

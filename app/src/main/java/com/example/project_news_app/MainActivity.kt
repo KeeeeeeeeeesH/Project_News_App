@@ -1,10 +1,10 @@
 package com.example.project_news_app
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
-import android.widget.ImageButton
+import android.util.Log
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                             0f
                         }
                     }
-                    newsAdapter.notifyDataSetChanged()
+                    fetchCoverImages(newsList)
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
                 }
@@ -195,5 +195,32 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun fetchCoverImages(newsList: List<NewsData>) {
+        val apiService = RetrofitClient.instance.create(ApiService::class.java)
+
+        newsList.forEach { news ->
+            apiService.getCoverImage(news.newsId).enqueue(object : Callback<List<PictureData>> {
+                override fun onResponse(call: Call<List<PictureData>>, response: Response<List<PictureData>>) {
+                    if (response.isSuccessful) {
+                        val pictures = response.body() ?: listOf()
+                        val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
+
+                        news.coverImageUrl = coverImage?.let { "http://10.3.58.145:5000/uploads/${it.pictureName}" }
+
+                        Log.d("MainActivity", "Cover Image URL: ${news.coverImageUrl}")
+                        newsAdapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+    }
+
 }
 

@@ -63,12 +63,13 @@ data class NewsData(
     @SerializedName("Cat_Id") val catId: Int,
     @SerializedName("Major_Id") val majorId: Int,
     var readCount: Int = 0,
-    var ratingScore: Float = 0f
+    var ratingScore: Float = 0f,
+    var coverImageUrl: String? = null
 )
 
 data class PictureData(
     @SerializedName("News_Id") val newsId: Int,
-    @SerializedName("News_Pic") val newsPic: String
+    @SerializedName("News_Pic") val pictureName: String
 )
 
 data class Favorite_CategoryData(
