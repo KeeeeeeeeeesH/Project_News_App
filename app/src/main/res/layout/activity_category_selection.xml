@@ -1,54 +1,79 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_selection_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:background="#E0FFFF"
-    tools:context=".CategorySelectionScreen">
+    android:background="@color/light_blue"
+    tools:context=".CategorySelectionActivity">
 
     <TextView
-        android:id="@+id/tvSelectCategoriesTitle"
+        android:id="@+id/tv_category_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="หมวดหมู่"
         android:textSize="24sp"
-        android:textStyle="bold"
+        android:textColor="@android:color/black"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginBottom="16dp"
+        android:layout_alignParentTop="true"
+        android:paddingTop="16dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_below="@id/tvSelectCategoriesTitle"
-        android:layout_above="@id/btnOk"
-        android:layout_marginTop="20dp"
-        android:padding="16dp"/>
+        android:layout_below="@id/tv_category_title"
+        android:layout_above="@id/btn_ok"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/categories_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:id="@+id/categories_layout_left"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+                <!-- Checkboxes will be dynamically added here -->
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/categories_layout_right"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="8dp">
+                <!-- Checkboxes will be dynamically added here -->
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <Button
-        android:id="@+id/btnOk"
+        android:id="@+id/btn_ok"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="OK"
-        android:backgroundTint="#8000FF"
-        android:textColor="#FFFFFF"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="OK"
+        android:backgroundTint="@color/light_gray"
+        android:textColor="@android:color/black"
         android:layout_above="@id/bottom_navigation"
-        android:layout_marginBottom="20dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"/>
+        android:layout_marginBottom="16dp" />
 
-    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/bottom_navigation_menu"
-        android:background="#E0FFFF"/>
+        android:background="#E0FFFF"
+        app:menu="@menu/bottom_navigation_menu" />
 </RelativeLayout>

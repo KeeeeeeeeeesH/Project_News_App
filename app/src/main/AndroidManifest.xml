@@ -64,6 +64,12 @@
         <activity android:name=".EditProfileActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".CategorySelectionActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".NewsFavoriteActivity"
+            android:exported="true">
+        </activity>
         <!-- Other activities -->
     </application>
 </manifest>
