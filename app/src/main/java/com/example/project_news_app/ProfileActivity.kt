@@ -57,6 +57,11 @@ class ProfileActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
+//        val memId = sharedPreferences.getInt("memId", 0)
+//        val fname = sharedPreferences.getString("fname", "")
+//        val lname = sharedPreferences.getString("lname", "")
+//        val welcomeTextView = findViewById<TextView>(R.id.member_name)
+//        welcomeTextView.text = "$fname $lname!"
         val memId = sharedPreferences.getInt("memId", 0)
         val fname = sharedPreferences.getString("fname", "")
         val lname = sharedPreferences.getString("lname", "")

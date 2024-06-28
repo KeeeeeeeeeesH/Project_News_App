@@ -13,7 +13,9 @@ interface ApiService {
 
     //LoginRequest
     @POST("api/loginMember/login")
-    fun loginMember(@Body request: LoginRequest): Call<LoginResponse>
+    fun loginMember(@Body request: LoginRequest): Call<MemberLoginResponse>
+    @POST("api/loginAdmin/login")
+    fun loginAdmin(@Body request: LoginRequest): Call<AdminLoginResponse>
 
     //OTP Request/Verify + ResetPassword
     @POST("api/recovery_member/request-otp")
