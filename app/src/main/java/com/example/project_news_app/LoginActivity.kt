@@ -79,6 +79,7 @@
 
 package com.example.project_news_app
 
+import android.util.Log
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -141,6 +142,7 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show()
             } else {
                 loginMember(username, password)
+                loginAdmin(username, password)
             }
         }
     }
@@ -149,10 +151,11 @@ class LoginActivity : AppCompatActivity() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val loginRequest = LoginRequest(login = username, password = password)
 
-        apiService.loginMember(loginRequest).enqueue(object : Callback<LoginResponse> {
-            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+        apiService.loginMember(loginRequest).enqueue(object : Callback<MemberLoginResponse> {
+            override fun onResponse(call: Call<MemberLoginResponse>, response: Response<MemberLoginResponse>) {
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
+                    Log.d("loginMember", "Response: $loginResponse") // เพิ่มบรรทัดนี้เพื่อดูการตอบสนองทั้งหมด
                     if (loginResponse?.success == true) {
                         // Save login status and user details in SharedPreferences
                         editor.putBoolean("isLoggedIn", true)
@@ -169,13 +172,96 @@ class LoginActivity : AppCompatActivity() {
                         startActivity(intent)
                         finish()
                     } else {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            loginResponse?.message ?: "Login failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<MemberLoginResponse>, t: Throwable) {
+                Toast.makeText(
+                    this@LoginActivity,
+                    "An error occurred: ${t.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
+    //    private fun loginAdmin(username: String, password: String) {
+//        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+//        val loginRequest = LoginRequest(login = username, password = password)
+//
+//        apiService.loginAdmin(loginRequest).enqueue(object : Callback<LoginResponse> {
+//            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+//                if (response.isSuccessful) {
+//                    val loginResponse = response.body()
+//                    if (loginResponse?.success == true) {
+//                        // Save login status and user details in SharedPreferences
+//                        editor.putBoolean("isLoggedIn", true)
+//                        editor.putInt("memId", loginResponse.users?.admId ?: 0)
+//                        editor.putString("username", loginResponse.users?.admUsername)
+//                        editor.putString("fname", loginResponse.users?.admFname)
+//                        editor.putString("lname", loginResponse.users?.admLname)
+//                        editor.putString("phone", loginResponse.users?.admPhone)
+//                        editor.putString("email", loginResponse.users?.admEmail)
+//                        editor.apply()
+//
+//                        // Navigate to MainActivity
+//                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+//                        startActivity(intent)
+//                        finish()
+//                    } else {
+//                        Toast.makeText(this@LoginActivity, loginResponse?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+//                    }
+//                } else {
+//                    Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+//                Toast.makeText(this@LoginActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+//            }
+//        })
+//    }
+    private fun loginAdmin(username: String, password: String) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        val loginRequest = LoginRequest(login = username, password = password)
+
+        apiService.loginAdmin(loginRequest).enqueue(object : Callback<AdminLoginResponse> {
+            override fun onResponse(call: Call<AdminLoginResponse>, response: Response<AdminLoginResponse>) {
+                if (response.isSuccessful) {
+                    val loginResponse = response.body()
+                    Log.d("LoginAdmin", "Response: $loginResponse") // เพิ่มบรรทัดนี้เพื่อดูการตอบสนองทั้งหมด
+                    if (loginResponse?.success == true) {
+                        Log.d("LoginAdmin", "fname: ${loginResponse.user?.admFname}, lname: ${loginResponse.user?.admLname}")
+
+                        // Save login status and user details in SharedPreferences
+                        editor.putBoolean("isLoggedIn", true)
+                        editor.putInt("memId", loginResponse.user?.admId ?: 0)
+                        editor.putString("username", loginResponse.user?.admUsername)
+                        editor.putString("fname", loginResponse.user?.admFname)
+                        editor.putString("lname", loginResponse.user?.admLname)
+                        editor.putString("phone", loginResponse.user?.admPhone)
+                        editor.putString("email", loginResponse.user?.admEmail)
+                        editor.apply()
+
+                        // Navigate to MainActivity
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
                         Toast.makeText(this@LoginActivity, loginResponse?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
                 }
             }
-            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+            override fun onFailure(call: Call<AdminLoginResponse>, t: Throwable) {
                 Toast.makeText(this@LoginActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })

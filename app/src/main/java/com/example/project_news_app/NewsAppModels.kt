@@ -8,12 +8,25 @@ data class LoginRequest(
     val login: String,
     val password: String,
 )
-data class LoginResponse(
+//data class LoginResponse(
+//    val success: Boolean,
+//    val message: String?,
+//    val user: MemberData?,
+//    val userId: String
+//
+//)
+data class AdminLoginResponse(
     val success: Boolean,
     val message: String?,
-    val user: MemberData?,
+    val user: AdminData?,  // สำหรับข้อมูลผู้ดูแลระบบ
     val userId: String
+)
 
+data class MemberLoginResponse(
+    val success: Boolean,
+    val message: String?,
+    val user: MemberData?,  // สำหรับข้อมูลสมาชิก
+    val userId: String
 )
 
 data class ResetPasswordRequest(
@@ -27,6 +40,16 @@ data class ResetPasswordResponse(
 data class PhoneNumberRequest(val phone: String)
 data class OtpRequest(val otp: String)
 data class OtpResponse(val success: Boolean, val message: String?)
+
+data class AdminData(
+    @SerializedName("Adm_Id") val admId: Int,
+    @SerializedName("Adm_Fname") val admFname: String,
+    @SerializedName("Adm_Lname") val admLname: String,
+    @SerializedName("Adm_Username") val admUsername: String,
+    @SerializedName("Adm_Password") val admPassword: String,
+    @SerializedName("Adm_Email") val admEmail: String,
+    @SerializedName("Adm_Phone") val admPhone: String
+)
 
 data class MemberData(
     @SerializedName("Mem_Id") val memId: Int,
