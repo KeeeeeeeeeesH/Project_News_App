@@ -33,7 +33,6 @@ interface ApiService {
     @PUT("api/member/{id}")
     fun updateMember(@Path("id") memId: Int, @Body memberData: MemberData): Call<MemberData>
 
-
     //CategoryData
     @GET("api/category")
     fun getCategory(): Call<List<CategoryData>>
@@ -49,7 +48,8 @@ interface ApiService {
     fun getNewsByCategoryPaged(
         @Path("id") catId: Int,
         @Query("page") page: Int,
-        @Query("limit") limit: Int): Call<List<NewsData>>
+        @Query("limit") limit: Int
+    ): Call<List<NewsData>>
     @GET("api/news/{id}")
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
 
@@ -67,7 +67,10 @@ interface ApiService {
     @POST("api/news_rating")
     fun postNewsRating(@Body newsRating: News_RatingData): Call<News_RatingData>
     @PUT("api/news_rating/{id}")
-    fun putNewsRatingByMemId(@Path("id") memId: Int, @Body newsRating: News_RatingData): Call<News_RatingData>
+    fun putNewsRatingByMemId(
+        @Path("id") memId: Int,
+        @Body newsRating: News_RatingData
+    ): Call<News_RatingData>
 
     //Total_ReadData
     @GET("api/total_read")
@@ -80,8 +83,16 @@ interface ApiService {
     //Sub_CategoryData
     @GET("api/sub_category")
     fun getSubcategory(): Call<List<Sub_CategoryData>>
-    @GET("api/sub_category/{id}")
-    fun getSubCategoryById(@Path("id") subCatId: Int): Call<Sub_CategoryData>
+    @GET("api/sub_category/ids")
+    fun getSubcategoriesByIds(@Query("ids") ids: List<Int>): Call<List<Sub_CategoryData>>
+
+    //News_Sub_CateData
+    @GET("api/news_sub_cate")
+    fun getNewsSubCate(): Call<List<News_Sub_CateData>>
+    @GET("api/news_sub_cate/{newsId}")
+    fun getNewsSubCateByNewsId(@Path("newsId") newsId: Int): Call<List<News_Sub_CateData>>
+    @GET("api/news_sub_cate/{id}")
+    fun getNewsSubCategoriesByNewsId(@Path("id") newsId: Int): Call<List<Sub_CategoryData>>
 
     //MajorData
     @GET("api/major")
@@ -117,14 +128,12 @@ interface ApiService {
     @POST("api/read_history")
     fun postReadHistory(@Body readHistory: Read_HistoryData): Call<Read_HistoryData>
     @PUT("api/read_history")
-    fun putReadHistoryByMemId(@Path("id") memId: Int, @Body readHistory: Read_HistoryData): Call<Read_HistoryData>
+    fun putReadHistoryByMemId(
+        @Path("id") memId: Int,
+        @Body readHistory: Read_HistoryData
+    ): Call<Read_HistoryData>
+
     @DELETE("api/read_history/{id}")
     fun deleteReadHistory(@Path("id") memId: Int): Call<Void>
-
-    //News_Sub_CateData
-    @GET("api/news_sub_cate")
-    fun getNewsSubCate(): Call<List<News_Sub_CateData>>
-    @GET("api/news_sub_cate/{id}")
-    fun getNewsSubCateByNewsId(@Path("id") newsId: Int): Call<News_Sub_CateData>
 }
 

@@ -1,5 +1,6 @@
 package com.example.project_news_app.adapters
 
+import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.project_news_app.NewsData
+import com.example.project_news_app.NewsDetailsActivity
 import com.example.project_news_app.R
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,7 +46,7 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
 
         holder.newsDate.text = formattedDate
         holder.newsReadCount.text = "อ่าน ${news.readCount} ครั้ง"
-        holder.newsRating.text = String.format("★ %.2f", news.ratingScore)
+        holder.newsRating.text = "★ %.2f".format(news.ratingScore)
 
         // Load cover image if available
         if (news.coverImageUrl != null) {
@@ -52,6 +54,13 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
             Glide.with(holder.itemView.context)
                 .load(news.coverImageUrl)
                 .into(holder.newsPicture)
+        }
+
+        // Set click listener to open NewsDetailsActivity
+        holder.itemView.setOnClickListener {
+            val intent = Intent(holder.itemView.context, NewsDetailsActivity::class.java)
+            intent.putExtra("news_id", news.newsId)
+            holder.itemView.context.startActivity(intent)
         }
     }
 
