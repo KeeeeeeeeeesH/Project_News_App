@@ -1,5 +1,6 @@
 package com.example.project_news_app
 
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -13,9 +14,9 @@ interface ApiService {
 
     //LoginRequest
     @POST("api/loginMember/login")
-    fun loginMember(@Body request: LoginRequest): Call<MemberLoginResponse>
-    @POST("api/loginAdmin/login")
-    fun loginAdmin(@Body request: LoginRequest): Call<AdminLoginResponse>
+    fun loginMember(@Body request: LoginRequest): Call<LoginResponse>
+//    @POST("api/loginAdmin/login")
+//    fun loginAdmin(@Body request: LoginRequest): Call<AdminLoginResponse>
 
     //OTP Request/Verify + ResetPassword
     @POST("api/recovery_member/request-otp")
@@ -26,8 +27,6 @@ interface ApiService {
     fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
 
     //MemberData
-    @GET("api/member")
-    fun getMember(): Call<List<MemberData>>
     @GET("api/member/{id}")
     fun getMemberById(@Path("id") memId: Int): Call<MemberData>
     @POST("api/member")
@@ -42,8 +41,6 @@ interface ApiService {
     fun getCategoryById(@Path("id") catId: Int): Call<CategoryData>
 
     //NewsData
-    @GET("api/news")
-    fun getNews(): Call<List<NewsData>>
     @GET("api/news/category/{id}")
     fun getNewsByCategory(@Path("id") catId: Int): Call<List<NewsData>>
     @GET("api/news/category/{id}")
@@ -56,8 +53,6 @@ interface ApiService {
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
 
     //PictureData
-    @GET("api/picture")
-    fun getPicture(): Call<List<PictureData>>
     @GET("api/picture/news/{newsId}")
     fun getCoverImage(@Path("newsId") newsId: Int): Call<List<PictureData>>
 
@@ -66,13 +61,12 @@ interface ApiService {
     fun getNewsRating(): Call<List<News_RatingData>>
     @GET("api/news_rating/{id}")
     fun getNewsRatingByNewsId(@Path("id") newsId: Int): Call<News_RatingData>
-    @POST("api/news_rating")
-    fun postNewsRating(@Body newsRating: News_RatingData): Call<News_RatingData>
-    @PUT("api/news_rating/{id}")
+    @PUT("api/news_rating/{memId}/{newsId}")
     fun putNewsRatingByMemId(
-        @Path("id") memId: Int,
+        @Path("memId") memId: Int,
+        @Path("newsId") newsId: Int,
         @Body newsRating: News_RatingData
-    ): Call<News_RatingData>
+    ): Call<ResponseBody>
 
     //Total_ReadData
     @GET("api/total_read")
@@ -93,8 +87,6 @@ interface ApiService {
     fun getNewsSubCate(): Call<List<News_Sub_CateData>>
     @GET("api/news_sub_cate/{newsId}")
     fun getNewsSubCateByNewsId(@Path("newsId") newsId: Int): Call<List<News_Sub_CateData>>
-    @GET("api/news_sub_cate/{id}")
-    fun getNewsSubCategoriesByNewsId(@Path("id") newsId: Int): Call<List<Sub_CategoryData>>
 
     //MajorData
     @GET("api/major")
@@ -134,7 +126,6 @@ interface ApiService {
         @Path("id") memId: Int,
         @Body readHistory: Read_HistoryData
     ): Call<Read_HistoryData>
-
     @DELETE("api/read_history/{id}")
     fun deleteReadHistory(@Path("id") memId: Int): Call<Void>
 }

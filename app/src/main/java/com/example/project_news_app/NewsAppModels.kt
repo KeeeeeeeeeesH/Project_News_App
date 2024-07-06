@@ -8,26 +8,25 @@ data class LoginRequest(
     val login: String,
     val password: String,
 )
-//data class LoginResponse(
-//    val success: Boolean,
-//    val message: String?,
-//    val user: MemberData?,
-//    val userId: String
-//
-//)
-data class AdminLoginResponse(
+data class LoginResponse(
     val success: Boolean,
     val message: String?,
-    val user: AdminData?,  // สำหรับข้อมูลผู้ดูแลระบบ
+    val user: MemberData?,
     val userId: String
 )
 
-data class MemberLoginResponse(
-    val success: Boolean,
-    val message: String?,
-    val user: MemberData?,  // สำหรับข้อมูลสมาชิก
-    val userId: String
-)
+//data class AdminLoginResponse(
+//    val success: Boolean,
+//    val message: String?,
+//    val user: AdminData?,  // สำหรับข้อมูลผู้ดูแลระบบ
+//    val userId: String
+//)
+//
+//data class MemberLoginResponse(
+//    val success: Boolean,
+//    val message: String?,
+//    val user: MemberData?  // สำหรับข้อมูลสมาชิก
+//)
 
 data class ResetPasswordRequest(
     val newPassword: String,
@@ -73,6 +72,11 @@ data class Sub_CategoryData(
     @SerializedName("Cat_Id") val catId: Int
 )
 
+data class News_Sub_CateData(
+    @SerializedName("News_Id") val newsId: Int,
+    @SerializedName("Sub_Cat_Id") val subCatId: Int
+)
+
 data class MajorData(
     @SerializedName("Major_Id") val majorId: Int,
     @SerializedName("Major_Level") val majorLevel: Int,
@@ -95,6 +99,12 @@ data class PictureData(
     @SerializedName("News_Pic") val pictureName: String
 )
 
+data class News_RatingData(
+    @SerializedName("Mem_Id") val memId: Int,
+    @SerializedName("News_Id") val newsId: Int,
+    @SerializedName("Rating_Score") val ratingScore: Float
+)
+
 data class Favorite_CategoryData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("Cat_Id") val catId: Int
@@ -103,12 +113,6 @@ data class Favorite_CategoryData(
 data class Read_LaterData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("News_Id") val newsId: Int
-)
-
-data class News_RatingData(
-    @SerializedName("Mem_Id") val memId: Int,
-    @SerializedName("News_Id") val newsId: Int,
-    @SerializedName("Rating_Score") val ratingScore: Float
 )
 
 data class Read_HistoryData(
@@ -122,10 +126,6 @@ data class Total_ReadData(
     @SerializedName("News_Id") val newsId: Int
 )
 
-data class News_Sub_CateData(
-    @SerializedName("News_Id") val newsId: Int,
-    @SerializedName("Sub_Cat_Id") val subCatId: Int
-)
 
 
 
