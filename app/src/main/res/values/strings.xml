@@ -31,4 +31,8 @@
         <item>4.5</item>
         <item>5.0</item>
     </string-array>
+    <string name="search_news">ค้นหาข่าว</string>
+    <string name="enter_news_title">กรอกชื่อหรือหัวข้อข่าว</string>
+    <string name="search">ค้นหา</string>
+    <string name="select_date">เลือกวันที่</string>
 </resources>
