@@ -62,11 +62,12 @@ class NewsDetailsActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         ratingSpinner.adapter = adapter
 
-
         val newsId = intent.getIntExtra("news_id", -1)
         if (newsId != -1) {
             fetchNewsDetails(newsId)
+            increaseReadCount(newsId) // เพิ่มการอ่านเมื่อเปิดหน้า
         }
+
         submitRatingButton.setOnClickListener {
             val newsId = intent.getIntExtra("news_id", -1)
             if (newsId != -1) {
@@ -123,9 +124,28 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
         })
     }
+    private fun increaseReadCount(newsId: Int) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        val totalRead = Total_ReadData(0, newsId) // Count_Id เป็น 0 เพราะจะให้ฐานข้อมูลเพิ่มค่าอัตโนมัติ
+
+        apiService.postTotalRead(totalRead).enqueue(object : Callback<Total_ReadData> {
+            override fun onResponse(call: Call<Total_ReadData>, response: Response<Total_ReadData>) {
+                if (response.isSuccessful) {
+                    Log.d("NewsDetailsActivity", "Read count increased successfully")
+                    fetchReadCount(newsId) // อัปเดตจำนวนการอ่านใน UI
+                } else {
+                    Log.e("NewsDetailsActivity", "Failed to increase read count")
+                }
+            }
+
+            override fun onFailure(call: Call<Total_ReadData>, t: Throwable) {
+                Log.e("NewsDetailsActivity", "Error: ${t.message}")
+            }
+        })
+    }
 
     // Fetch read count from API
-    private fun fetchReadCount(news: NewsData) {
+    private fun fetchReadCount(newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
         apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
@@ -135,8 +155,8 @@ class NewsDetailsActivity : AppCompatActivity() {
             ) {
                 if (response.isSuccessful) {
                     val readCounts = response.body() ?: listOf()
-                    news.readCount = readCounts.count { it.newsId == news.newsId }
-                    newsReadCount.text = "อ่าน ${news.readCount} ครั้ง"
+                    val readCount = readCounts.count { it.newsId == newsId }
+                    newsReadCount.text = "อ่าน $readCount ครั้ง"
                 }
             }
 
@@ -257,22 +277,6 @@ class NewsDetailsActivity : AppCompatActivity() {
         })
     }
 
-    private fun displayNewsDetails(news: NewsData) {
-        fetchCategoryName(news.catId)
-        fetchMajorLevel(news.majorId)
-        fetchReadCount(news)
-        fetchRating(news)
-        fetchFormattedDate(news.dateAdded.toString())
-        newsTitle.text = news.newsName
-        newsDetails.text = news.newsDetails
-
-        // Fetch and display news subcategories
-        fetchNewsSubCategories(news.newsId)
-
-        // Fetch and display images excluding cover image
-        fetchImages(news.newsId)
-    }
-
     private fun fetchNewsSubCategories(newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -324,6 +328,22 @@ class NewsDetailsActivity : AppCompatActivity() {
                 newsSubCategory.text = "แท็กข่าว: เกิดข้อผิดพลาดในการดึงแท็กข่าว"
             }
         })
+    }
+
+    private fun displayNewsDetails(news: NewsData) {
+        fetchCategoryName(news.catId)
+        fetchMajorLevel(news.majorId)
+        fetchReadCount(news.newsId)
+        fetchRating(news)
+        fetchFormattedDate(news.dateAdded.toString())
+        newsTitle.text = news.newsName
+        newsDetails.text = news.newsDetails
+
+        // Fetch and display news subcategories
+        fetchNewsSubCategories(news.newsId)
+
+        // Fetch and display images excluding cover image
+        fetchImages(news.newsId)
     }
 }
 

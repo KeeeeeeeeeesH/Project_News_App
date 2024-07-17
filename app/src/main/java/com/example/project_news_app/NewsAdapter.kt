@@ -49,11 +49,13 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
         holder.newsRating.text = "★ %.2f".format(news.ratingScore)
 
         // Load cover image if available
-        if (news.coverImageUrl != null) {
+        if (!news.coverImageUrl.isNullOrEmpty()) {
             Log.d("NewsAdapter", "Loading image from URL: ${news.coverImageUrl}") // Debug log
             Glide.with(holder.itemView.context)
                 .load(news.coverImageUrl)
                 .into(holder.newsPicture)
+        } else {
+            holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon) // รูป placeholder_image ต้องอยู่ใน drawable
         }
 
         // Set click listener to open NewsDetailsActivity

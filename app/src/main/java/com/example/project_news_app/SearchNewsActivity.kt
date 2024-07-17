@@ -11,7 +11,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.appcompat.widget.Toolbar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,8 +33,15 @@ class SearchNewsActivity : AppCompatActivity() {
         searchByDateButton = findViewById(R.id.search_by_date_button)
         timePeriodSpinner = findViewById(R.id.time_period_spinner)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener {
+            finish()
+        }
+
         // Set up the spinner with options
-        val timePeriods = arrayOf("เลือกช่วงเวลา", "1 สัปดาห์ที่แล้ว", "1 เดือนที่แล้ว", "1 ปีที่แล้ว")
+        val timePeriods = arrayOf("เลือกช่วงเวลา", "ข่าวในสัปดาห์นี้", "1 สัปดาห์ที่แล้ว", "1 เดือนที่แล้ว", "6 เดือนที่แล้ว", "1 ปีที่แล้ว")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, timePeriods)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         timePeriodSpinner.adapter = adapter
@@ -70,37 +77,16 @@ class SearchNewsActivity : AppCompatActivity() {
         timePeriodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 when (position) {
-                    1 -> searchNewsByTimePeriod("WEEK")
-                    2 -> searchNewsByTimePeriod("MONTH")
-                    3 -> searchNewsByTimePeriod("YEAR")
+                    1 -> searchNewsByTimePeriod("CURRENT_WEEK")
+                    2 -> searchNewsByTimePeriod("LAST_WEEK")
+                    3 -> searchNewsByTimePeriod("LAST_MONTH")
+                    4 -> searchNewsByTimePeriod("LAST_SIX_MONTHS")
+                    5 -> searchNewsByTimePeriod("LAST_YEAR")
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
                 // Do nothing
-            }
-        }
-
-        val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNavigation.setOnNavigationItemSelectedListener {
-            when (it.itemId) {
-                R.id.navigation_home -> {
-                    // กลับไปที่หน้า Home
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                R.id.navigation_favorite -> {
-                    // อยู่ที่หน้า Favorite
-                    true
-                }
-                R.id.navigation_profile -> {
-                    // ไปที่หน้า Profile
-                    val intent = Intent(this, ProfileActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                else -> false
             }
         }
     }
@@ -153,4 +139,16 @@ class SearchNewsActivity : AppCompatActivity() {
         setResult(RESULT_OK, intent)
         finish()
     }
+
+//    override fun onBackPressed() {
+//        if (foundNewsLabel.visibility == View.VISIBLE) {
+//            // ถ้าอยู่ในหน้าข่าวที่พบ ให้กลับไปที่หน้าค้นหา
+//            val intent = Intent(this, SearchNewsActivity::class.java)
+//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+//            startActivity(intent)
+//            finish()
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
 }

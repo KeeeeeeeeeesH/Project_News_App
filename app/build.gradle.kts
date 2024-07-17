@@ -120,6 +120,8 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
 
     // Jetpack Compose dependencies
     implementation("androidx.compose.ui:ui:1.6.7")

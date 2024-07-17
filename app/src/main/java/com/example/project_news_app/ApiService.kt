@@ -41,6 +41,8 @@ interface ApiService {
     fun getCategoryById(@Path("id") catId: Int): Call<CategoryData>
 
     //NewsData
+    @GET("api/news")
+    fun getAllNews(): Call<List<NewsData>>
     @GET("api/news/category/{id}")
     fun getNewsByCategory(@Path("id") catId: Int): Call<List<NewsData>>
     @GET("api/news/category/{id}")

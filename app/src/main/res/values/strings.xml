@@ -34,5 +34,6 @@
     <string name="search_news">ค้นหาข่าว</string>
     <string name="enter_news_title">กรอกชื่อหรือหัวข้อข่าว</string>
     <string name="search">ค้นหา</string>
-    <string name="select_date">เลือกวันที่</string>
+    <string name="select_date">ค้นหาจากวันที่ลงข่าว</string>
+    <string name="found_news">ข่าวที่พบ</string>
 </resources>
