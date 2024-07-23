@@ -354,5 +354,14 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_REQUEST_CODE = 1
     }
+
+    // Reload activity
+    override fun onResume() {
+        super.onResume()
+        // Reload the data when coming back to this activity
+        loadNewsByCategory(currentCategoryId)
+    }
 }
+
+
 

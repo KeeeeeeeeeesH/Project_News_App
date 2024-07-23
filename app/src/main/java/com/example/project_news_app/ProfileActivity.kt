@@ -69,10 +69,24 @@ class ProfileActivity : AppCompatActivity() {
         welcomeTextView.text = "$fname $lname!"
 
         val editProfileButton = findViewById<Button>(R.id.editProfileButton)
+        val readNewsLaterButton = findViewById<Button>(R.id.readLaterButton)
+        val VisitHistoryNewsButton = findViewById<Button>(R.id.NewHistoryButton)
+
         editProfileButton.setOnClickListener {
             val intent = Intent(this, EditProfileActivity::class.java)
             startActivityForResult(intent, 1)
         }
+
+        readNewsLaterButton.setOnClickListener {
+            val intent = Intent(this, ReadLaterActivity::class.java)
+            startActivity(intent)
+        }
+
+        VisitHistoryNewsButton.setOnClickListener {
+            val intent = Intent(this, VisitHistoryActivity::class.java)
+            startActivity(intent)
+        }
+
 
         val logoutButton = findViewById<Button>(R.id.logout_button)
         logoutButton.setOnClickListener {

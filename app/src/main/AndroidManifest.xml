@@ -73,6 +73,13 @@
         <activity android:name=".SearchNewsActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".ReadLaterActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".VisitHistoryActivity"
+            android:exported="true">
+        </activity>
+
         <!-- Other activities -->
     </application>
 </manifest>
