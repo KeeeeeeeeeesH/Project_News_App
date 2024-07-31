@@ -3,6 +3,7 @@ package com.example.project_news_app
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -37,6 +38,9 @@ class SearchNewsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
             finish()
         }
 
@@ -112,6 +116,7 @@ class SearchNewsActivity : AppCompatActivity() {
     }
 
     private fun searchNewsByName(query: String) {
+        Log.d("SearchNewsActivity", "Search query: $query")
         val intent = Intent().apply {
             putExtra("SEARCH_QUERY", query)
             putExtra("SEARCH_TYPE", "NAME")
@@ -140,15 +145,11 @@ class SearchNewsActivity : AppCompatActivity() {
         finish()
     }
 
-//    override fun onBackPressed() {
-//        if (foundNewsLabel.visibility == View.VISIBLE) {
-//            // ถ้าอยู่ในหน้าข่าวที่พบ ให้กลับไปที่หน้าค้นหา
-//            val intent = Intent(this, SearchNewsActivity::class.java)
-//            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-//            startActivity(intent)
-//            finish()
-//        } else {
-//            super.onBackPressed()
-//        }
-//    }
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
+        super.onBackPressed() // Add this line to call the super method
+    }
 }

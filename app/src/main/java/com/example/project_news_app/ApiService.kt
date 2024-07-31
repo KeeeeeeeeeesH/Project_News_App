@@ -130,5 +130,6 @@ interface ApiService {
     ): Call<Read_HistoryData>
     @DELETE("api/read_history/{id}")
     fun deleteReadHistory(@Path("id") memId: Int): Call<Void>
+
 }
 

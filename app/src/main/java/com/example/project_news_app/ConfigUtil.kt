@@ -6,14 +6,11 @@ import java.io.IOException
 
 object ConfigUtil {
     fun getBaseUrl(context: Context): String {
-        return try {
-            val inputStream = context.assets.open("config.json")
-            val json = inputStream.bufferedReader().use { it.readText() }
-            val jsonObject = JSONObject(json)
-            jsonObject.getString("baseUrl")
-        } catch (e: IOException) {
-            e.printStackTrace()
-            "http://localhost:5000/"
-        }
+        val assetManager = context.assets
+        val inputStream = assetManager.open("config.json")
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+        val jsonObject = JSONObject(jsonString)
+        return jsonObject.getString("baseUrl")
     }
 }
+

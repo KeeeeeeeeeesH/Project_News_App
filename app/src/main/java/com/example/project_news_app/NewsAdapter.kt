@@ -17,16 +17,23 @@ import java.util.*
 
 class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
-    fun setNews(newList: List<NewsData>) {
-        newsList = newList
+    fun setNews(news: List<NewsData>) {
+        this.newsList = news
+        Log.d("NewsAdapter", "Set news list size: ${news.size}")
+        news.forEach { newsData ->
+            Log.d("NewsAdapter", "Set News: ${newsData.newsName}")
+        }
         notifyDataSetChanged()
     }
 
     fun addNews(news: List<NewsData>) {
-        val currentList = ArrayList(this.newsList)
-        currentList.addAll(news)
-        this.newsList = currentList
-        notifyDataSetChanged()
+        val currentSize = newsList.size
+        newsList = newsList + news
+        Log.d("NewsAdapter", "Added news. New list size: ${newsList.size}")
+        news.forEach { newsData ->
+            Log.d("NewsAdapter", "Added News: ${newsData.newsName}")
+        }
+        notifyItemRangeInserted(currentSize, news.size)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
@@ -76,3 +83,4 @@ class NewsAdapter(private var newsList: List<NewsData>) : RecyclerView.Adapter<N
         val newsRating: TextView = itemView.findViewById(R.id.rating_score)
     }
 }
+

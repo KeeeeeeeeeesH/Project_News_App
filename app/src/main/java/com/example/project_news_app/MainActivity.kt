@@ -2,8 +2,10 @@ package com.example.project_news_app
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -30,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var foundNewsLabel: TextView
+    private lateinit var backButton: ImageButton
+    private lateinit var foundNewsContainer: View
 
     private var currentCategoryId: Int = 0 // Default to "แนะนำ"
     private var currentPage: Int = 0 // Page index for loading more news
@@ -46,6 +50,8 @@ class MainActivity : AppCompatActivity() {
         newsRecyclerView = findViewById(R.id.news_recycler_view)
         bottomNavigation = findViewById(R.id.bottom_navigation)
         foundNewsLabel = findViewById(R.id.found_news_label)
+        backButton = findViewById(R.id.back_button)
+        foundNewsContainer = findViewById(R.id.found_news_container)
 
         categoriesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         newsRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -90,6 +96,10 @@ class MainActivity : AppCompatActivity() {
 
         searchButton.setOnClickListener {
             startActivityForResult(Intent(this, SearchNewsActivity::class.java), SEARCH_REQUEST_CODE)
+        }
+
+        backButton.setOnClickListener {
+            onBackPressed()
         }
 
         newsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -141,11 +151,11 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body() ?: listOf()
+                    val newNewsList = newsList.distinctBy { it.newsId }
                     if (currentPage == 0) {
-                        allNewsList = newsList
-                        newsAdapter.setNews(newsList)
+                        allNewsList = newNewsList
+                        newsAdapter.setNews(newNewsList)
                     } else {
-                        val newNewsList = newsList.distinctBy { it.newsId }
                         allNewsList = (allNewsList + newNewsList).distinctBy { it.newsId }
                         newsAdapter.addNews(newNewsList)
                     }
@@ -163,20 +173,6 @@ class MainActivity : AppCompatActivity() {
                 swipeRefreshLayout.isRefreshing = false // Stop the refreshing indicator
             }
         })
-    }
-
-
-    private fun searchNews(query: String) {
-        val filteredNewsList = allNewsList.filter {
-            it.newsName.contains(query, ignoreCase = true) || isDateMatch(it.dateAdded, query)
-        }
-        newsAdapter.setNews(filteredNewsList)
-    }
-
-    private fun isDateMatch(date: Date, query: String): Boolean {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val dateString = dateFormat.format(date)
-        return dateString.contains(query)
     }
 
     private fun fetchReadCounts(newsList: List<NewsData>) {
@@ -205,10 +201,7 @@ class MainActivity : AppCompatActivity() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
         apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
-            override fun onResponse(
-                call: Call<List<News_RatingData>>,
-                response: Response<List<News_RatingData>>
-            ) {
+            override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
                 if (response.isSuccessful) {
                     val ratings = response.body() ?: listOf()
                     newsList.forEach { news ->
@@ -222,8 +215,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     fetchCoverImages(newsList)
                 } else {
-                    Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -232,6 +224,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
     private fun fetchCoverImages(newsList: List<NewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -269,18 +262,28 @@ class MainActivity : AppCompatActivity() {
 
             // เปลี่ยนแถบหมวดหมู่เป็น "ข่าวที่พบ"
             findViewById<View>(R.id.categories_container).visibility = View.GONE
-            foundNewsLabel.visibility = View.VISIBLE
+            foundNewsContainer.visibility = View.VISIBLE
+
             // เอาปุ่มค้นหาออก
             findViewById<View>(R.id.search_bar_container).visibility = View.GONE
         }
+    }
+
+    private fun searchNews(query: String) {
+        val filteredNewsList = allNewsList.filter {
+            it.newsName.contains(query, ignoreCase = true)
+        }.distinctBy { it.newsId } // ป้องกันการแสดงข่าวซ้ำ
+
+        newsAdapter.setNews(filteredNewsList)
     }
 
     private fun searchNewsByDate(query: String) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val date = dateFormat.parse(query)
         val filteredNewsList = allNewsList.filter {
-            isDateMatch(it.dateAdded, query)
-        }
+            it.dateAdded != null && isDateMatch(it.dateAdded, query)
+        }.distinctBy { it.newsId } // ป้องกันการแสดงข่าวซ้ำ
+
         newsAdapter.setNews(filteredNewsList)
     }
 
@@ -288,15 +291,14 @@ class MainActivity : AppCompatActivity() {
         val calendar = Calendar.getInstance()
         val currentDate = Date()
 
-        when (period) {
+        val filteredNewsList = when (period) {
             "CURRENT_WEEK" -> {
                 calendar.time = currentDate
                 calendar.add(Calendar.DAY_OF_YEAR, -7)
                 val targetDate = calendar.time
-                val filteredNewsList = allNewsList.filter {
-                    it.dateAdded.after(targetDate)
+                allNewsList.filter {
+                    it.dateAdded != null && it.dateAdded.after(targetDate)
                 }
-                newsAdapter.setNews(filteredNewsList)
             }
             "LAST_WEEK" -> {
                 calendar.time = currentDate
@@ -304,48 +306,51 @@ class MainActivity : AppCompatActivity() {
                 val endDate = calendar.time
                 calendar.add(Calendar.DAY_OF_YEAR, -7)
                 val startDate = calendar.time
-                val filteredNewsList = allNewsList.filter {
-                    it.dateAdded.after(startDate) && it.dateAdded.before(endDate)
+                allNewsList.filter {
+                    it.dateAdded != null && it.dateAdded.after(startDate) && it.dateAdded.before(endDate)
                 }
-                newsAdapter.setNews(filteredNewsList)
             }
             "LAST_MONTH" -> {
                 calendar.time = currentDate
                 calendar.add(Calendar.DAY_OF_YEAR, -30)
                 val targetDate = calendar.time
-                val filteredNewsList = allNewsList.filter {
-                    it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
+                allNewsList.filter {
+                    it.dateAdded != null && it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
                 }
-                newsAdapter.setNews(filteredNewsList)
             }
             "LAST_SIX_MONTHS" -> {
                 calendar.time = currentDate
                 calendar.add(Calendar.DAY_OF_YEAR, -180)
                 val targetDate = calendar.time
-                val filteredNewsList = allNewsList.filter {
-                    it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
+                allNewsList.filter {
+                    it.dateAdded != null && it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
                 }
-                newsAdapter.setNews(filteredNewsList)
             }
             "LAST_YEAR" -> {
                 calendar.time = currentDate
                 calendar.add(Calendar.DAY_OF_YEAR, -365)
                 val targetDate = calendar.time
-                val filteredNewsList = allNewsList.filter {
-                    it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
+                allNewsList.filter {
+                    it.dateAdded != null && it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
                 }
-                newsAdapter.setNews(filteredNewsList)
             }
-        }
+            else -> listOf()
+        }.distinctBy { it.newsId } // ป้องกันการแสดงข่าวซ้ำ
+
+        newsAdapter.setNews(filteredNewsList)
+    }
+
+    private fun isDateMatch(date: Date, query: String): Boolean {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val dateString = dateFormat.format(date)
+        return dateString == query
     }
 
     override fun onBackPressed() {
-        if (foundNewsLabel.visibility == View.VISIBLE) {
+        if (foundNewsContainer.visibility == View.VISIBLE) {
             // ถ้าอยู่ในหน้าข่าวที่พบ ให้กลับไปที่หน้าค้นหา
             val intent = Intent(this, SearchNewsActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
-            finish()
         } else {
             super.onBackPressed()
         }
@@ -362,6 +367,3 @@ class MainActivity : AppCompatActivity() {
         loadNewsByCategory(currentCategoryId)
     }
 }
-
-
-

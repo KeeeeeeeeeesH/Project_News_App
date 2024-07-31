@@ -31,12 +31,42 @@
             android:contentDescription="Search"/>
     </LinearLayout>
 
+    <!-- Found News Label and Back Button -->
+    <LinearLayout
+        android:id="@+id/found_news_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#E0FFFF"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        android:layout_below="@id/search_bar_container">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Back"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/found_news_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ข่าวที่พบ"
+            android:textSize="18sp"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
     <!-- Categories -->
     <LinearLayout
         android:id="@+id/categories_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_bar_container"
+        android:layout_below="@id/found_news_container"
         android:background="#FFFFFF"
         android:orientation="horizontal">
 
@@ -74,34 +104,6 @@
             android:padding="10dp"
             tools:listitem="@layout/item_news"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- Found News Label with Back Button -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/search_bar_container"
-        android:orientation="horizontal"
-        android:visibility="gone"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-
-        <ImageButton
-            android:id="@+id/back_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_back"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Back"
-            android:layout_marginEnd="8dp" />
-
-        <TextView
-            android:id="@+id/found_news_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ข่าวที่พบ"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-    </LinearLayout>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
