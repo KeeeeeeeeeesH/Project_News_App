@@ -2,6 +2,7 @@ package com.example.project_news_app
 
 import java.util.Date
 import com.google.gson.annotations.SerializedName
+import java.sql.Time
 import java.sql.Timestamp
 
 data class LoginRequest(
@@ -15,19 +16,6 @@ data class LoginResponse(
     val userId: String
 )
 
-//data class AdminLoginResponse(
-//    val success: Boolean,
-//    val message: String?,
-//    val user: AdminData?,  // สำหรับข้อมูลผู้ดูแลระบบ
-//    val userId: String
-//)
-//
-//data class MemberLoginResponse(
-//    val success: Boolean,
-//    val message: String?,
-//    val user: MemberData?  // สำหรับข้อมูลสมาชิก
-//)
-
 data class ResetPasswordRequest(
     val newPassword: String,
     val confirmPassword: String
@@ -40,15 +28,6 @@ data class PhoneNumberRequest(val phone: String)
 data class OtpRequest(val otp: String)
 data class OtpResponse(val success: Boolean, val message: String?)
 
-data class AdminData(
-    @SerializedName("Adm_Id") val admId: Int,
-    @SerializedName("Adm_Fname") val admFname: String,
-    @SerializedName("Adm_Lname") val admLname: String,
-    @SerializedName("Adm_Username") val admUsername: String,
-    @SerializedName("Adm_Password") val admPassword: String,
-    @SerializedName("Adm_Email") val admEmail: String,
-    @SerializedName("Adm_Phone") val admPhone: String
-)
 
 data class MemberData(
     @SerializedName("Mem_Id") val memId: Int,
@@ -118,15 +97,20 @@ data class Read_LaterData(
 data class Read_HistoryData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("News_Id") val newsId: Int,
-    @SerializedName("Read_Date") val readDate: Timestamp
+    @SerializedName("Read_Date") val readDate: Timestamp,
 )
+
+data class ReadHistoryWithNewsData(
+    val newsId: Int,
+    val readDate: Timestamp,
+    var readCount: Int,
+    val newsName: String,
+    var ratingScore: Float,
+    var coverImage: String
+)
+
 
 data class Total_ReadData(
     @SerializedName("Count_Id") val countId: Int,
     @SerializedName("News_Id") val newsId: Int
 )
-
-
-
-
-

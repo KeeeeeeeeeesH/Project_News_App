@@ -119,17 +119,16 @@ interface ApiService {
     //Read_HistoryData
     @GET("api/read_history")
     fun getReadHistory(): Call<List<Read_HistoryData>>
-    @GET("api/read_history/{id}")
-    fun getReadHistoryByMemId(@Path("id") memId: Int): Call<Read_HistoryData>
+
+    @GET("api/read_history/{memId}")
+    fun getReadHistoryByMemId(@Path("memId") memId: Int): Call<List<Read_HistoryData>>
+
     @POST("api/read_history")
-    fun postReadHistory(@Body readHistory: Read_HistoryData): Call<Read_HistoryData>
-    @PUT("api/read_history")
-    fun putReadHistoryByMemId(
-        @Path("id") memId: Int,
-        @Body readHistory: Read_HistoryData
-    ): Call<Read_HistoryData>
-    @DELETE("api/read_history/{id}")
-    fun deleteReadHistory(@Path("id") memId: Int): Call<Void>
+    fun addReadHistory(@Body readHistory: Read_HistoryData): Call<Void>
+
+    @DELETE("api/read_history/{memId}/{newsId}")
+    fun deleteReadHistory(@Path("memId") memId: Int, @Path("newsId") newsId: Int): Call<Void>
+
 
 }
 

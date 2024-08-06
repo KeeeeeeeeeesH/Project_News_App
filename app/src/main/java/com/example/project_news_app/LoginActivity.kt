@@ -139,7 +139,7 @@ class LoginActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in both fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "กรุณากรอกชื่อผู้ใช้หรืออีเมล์ และรหัสผ่าน", Toast.LENGTH_SHORT).show()
             } else {
                 loginMember(username, password)
                 //loginAdmin(username, password)
@@ -158,7 +158,7 @@ class LoginActivity : AppCompatActivity() {
                     Log.d(
                         "loginMember",
                         "Response: $loginResponse"
-                    ) // เพิ่มบรรทัดนี้เพื่อดูการตอบสนองทั้งหมด
+                    )
                     if (loginResponse?.success == true) {
                         // Save login status and user details in SharedPreferences
                         editor.putBoolean("isLoggedIn", true)
@@ -177,7 +177,7 @@ class LoginActivity : AppCompatActivity() {
                     } else {
                         Toast.makeText(
                             this@LoginActivity,
-                            loginResponse?.message ?: "Login failed: Unexpected response",
+                            loginResponse?.message ?: "ล็อคอินไม่สำเร็จ เกิดข้อผิดพลาดที่ไม่คาดคิด",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -185,7 +185,7 @@ class LoginActivity : AppCompatActivity() {
                     val errorMessage = response.errorBody()?.string()
                     Toast.makeText(
                         this@LoginActivity,
-                        "Login failed: $errorMessage",
+                        "ชื่อผู้ใช้อีเมล์ หรือรหัสผ่านไม่ถูกต้อง",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

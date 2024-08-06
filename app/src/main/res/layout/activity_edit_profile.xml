@@ -16,60 +16,125 @@
         android:layout_marginTop="30dp"
         android:textColor="@android:color/black"/>
 
+    <TextView
+        android:id="@+id/usernameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ชื่อผู้ใช้"
+        android:textSize="16sp"
+        android:layout_below="@id/editProfileTitle"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/black"/>
+
     <EditText
         android:id="@+id/usernameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="username"
-        android:layout_below="@id/editProfileTitle"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/usernameLabel"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/edit_text_background"/>
+        android:background="@drawable/edit_text_background"
+        android:minHeight="48dp"
+        android:padding="12dp"/>
+
+    <TextView
+        android:id="@+id/fnameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ชื่อจริง"
+        android:textSize="16sp"
+        android:layout_below="@id/usernameEditText"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/black"/>
 
     <EditText
         android:id="@+id/fnameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="first name"
-        android:layout_below="@id/usernameEditText"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/fnameLabel"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/edit_text_background"/>
+        android:background="@drawable/edit_text_background"
+        android:minHeight="48dp"
+        android:padding="12dp"/>
+
+    <TextView
+        android:id="@+id/lnameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="นามสกุล"
+        android:textSize="16sp"
+        android:layout_below="@id/fnameEditText"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/black"/>
 
     <EditText
         android:id="@+id/lnameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="lastname"
-        android:layout_below="@id/fnameEditText"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/lnameLabel"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/edit_text_background"/>
+        android:background="@drawable/edit_text_background"
+        android:minHeight="48dp"
+        android:padding="12dp"/>
+
+    <TextView
+        android:id="@+id/phoneLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="เบอร์โทร"
+        android:textSize="16sp"
+        android:layout_below="@id/lnameEditText"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/black"/>
 
     <EditText
         android:id="@+id/phoneEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="phone number"
-        android:layout_below="@id/lnameEditText"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/phoneLabel"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/edit_text_background"/>
+        android:background="@drawable/edit_text_background"
+        android:minHeight="48dp"
+        android:padding="12dp"/>
+
+    <TextView
+        android:id="@+id/emailLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="อีเมล์"
+        android:textSize="16sp"
+        android:layout_below="@id/phoneEditText"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/black"/>
 
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="email"
-        android:layout_below="@id/phoneEditText"
-        android:layout_marginTop="20dp"
+        android:layout_below="@id/emailLabel"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/edit_text_background"/>
+        android:background="@drawable/edit_text_background"
+        android:minHeight="48dp"
+        android:padding="12dp"/>
 
     <Button
         android:id="@+id/saveButton"
