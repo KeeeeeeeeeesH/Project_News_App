@@ -14,11 +14,16 @@ import com.example.project_news_app.NewsData
 import com.example.project_news_app.NewsDetailsActivity
 import com.example.project_news_app.R
 import com.example.project_news_app.ReadHistoryWithNewsData
+import com.example.project_news_app.ReadLaterActivity
 import com.example.project_news_app.VisitHistoryActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NewsAdapter(private var newsList: List<Any>, private val isVisitHistory: Boolean = false) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+class NewsAdapter(
+    private var newsList: List<Any>,
+    private val isReadLater: Boolean = false,
+    private val isVisitHistory: Boolean = false
+) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     fun setNews(news: List<Any>) {
         this.newsList = news
@@ -113,6 +118,28 @@ class NewsAdapter(private var newsList: List<Any>, private val isVisitHistory: B
                 intent.putExtra("news_id", item.newsId)
                 holder.itemView.context.startActivity(intent)
             }
+
+            // Set long click listener to delete from read later
+            if (isReadLater) {
+                holder.itemView.setOnLongClickListener {
+                    AlertDialog.Builder(holder.itemView.context)
+                        .setTitle("ลบข่าวอ่านภายหลัง")
+                        .setMessage("คุณต้องการลบข่าวนี้จากรายการอ่านภายหลังหรือไม่?")
+                        .setPositiveButton("ใช่") { dialog, _ ->
+                            val sharedPreferences = holder.itemView.context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                            val memId = sharedPreferences.getInt("memId", -1)
+                            if (memId != -1 && holder.itemView.context is ReadLaterActivity) {
+                                (holder.itemView.context as ReadLaterActivity).deleteReadLater(memId, item.newsId)
+                            }
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("ไม่") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                    true
+                }
+            }
         }
     }
 
@@ -126,6 +153,3 @@ class NewsAdapter(private var newsList: List<Any>, private val isVisitHistory: B
         val newsRating: TextView = itemView.findViewById(R.id.rating_score)
     }
 }
-
-
-

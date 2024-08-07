@@ -94,6 +94,7 @@ data class Read_LaterData(
     @SerializedName("News_Id") val newsId: Int
 )
 
+
 data class Read_HistoryData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("News_Id") val newsId: Int,

@@ -35,8 +35,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var backButton: ImageButton
     private lateinit var foundNewsContainer: View
 
-    private var currentCategoryId: Int = 0 // Default to "แนะนำ"
-    private var currentPage: Int = 0 // Page index for loading more news
+    private var currentCategoryId: Int = 0 // Default ไปที่ "แนะนำ"
+    private var currentPage: Int = 0 // index ของหน้าข่าวสำหรับการโหลดข่าวเพิ่ม
     private var allNewsList: List<NewsData> = listOf() // All news list
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,14 +110,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // Set up SwipeRefreshLayout
+        // swipe refresh
         swipeRefreshLayout.setOnRefreshListener {
             loadNewsByCategory(currentCategoryId)
         }
     }
 
     private fun onToggleCategoriesClick() {
-        // Logic to handle the toggle categories click
+
     }
 
     private fun loadCategories() {
@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadNewsByCategory(catId: Int) {
         currentPage = 0
-        allNewsList = listOf() // Reset all news list
+        allNewsList = listOf()
         loadMoreNews()
     }
 

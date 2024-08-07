@@ -36,7 +36,9 @@ class NewsDetailsActivity : AppCompatActivity() {
     private lateinit var ratingSpinner: Spinner
     private lateinit var submitRatingButton: Button
     private lateinit var saveForLaterButton: ImageView
-
+    private var isSavedForLater: Boolean = false
+    private var memId: Int = -1
+    private var newsId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,23 +70,25 @@ class NewsDetailsActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         ratingSpinner.adapter = adapter
 
-        val newsId = intent.getIntExtra("news_id", -1)
+        newsId = intent.getIntExtra("news_id", -1)
+        val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        memId = sharedPreferences.getInt("memId", -1)
+
         if (newsId != -1) {
             fetchNewsDetails(newsId)
             increaseReadCount(newsId) // เพิ่มการอ่านเมื่อเปิดหน้า
             addReadHistory(newsId) // เพิ่มประวัติการอ่านเมื่อเปิดหน้า
+            checkIfSavedForLater(memId, newsId) // ตรวจสอบสถานะการบันทึกข่าวอ่านภายหลัง
         }
 
         submitRatingButton.setOnClickListener {
-            val newsId = intent.getIntExtra("news_id", -1)
             if (newsId != -1) {
                 submitRating(newsId)
             }
         }
 
-
         saveForLaterButton.setOnClickListener {
-            saveNewsForLater(newsId)
+            saveOrRemoveNewsForLater(memId, newsId)
         }
     }
 
@@ -362,34 +366,6 @@ class NewsDetailsActivity : AppCompatActivity() {
         addReadHistory(news.newsId)
     }
 
-    private fun saveNewsForLater(newsId: Int) {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        apiService.getNewsById(newsId).enqueue(object : Callback<NewsData> {
-            override fun onResponse(call: Call<NewsData>, response: Response<NewsData>) {
-                if (response.isSuccessful) {
-                    val news = response.body()
-                    news?.let {
-                        val sharedPreferences = getSharedPreferences("read_later_prefs", MODE_PRIVATE)
-                        val editor = sharedPreferences.edit()
-                        val gson = Gson()
-                        val newsJson = sharedPreferences.getString("read_later_news", "[]")
-                        val readLaterNewsList = gson.fromJson(newsJson, Array<NewsData>::class.java).toMutableList()
-
-                        readLaterNewsList.removeAll { it.newsId == news.newsId }
-                        readLaterNewsList.add(it)
-                        editor.putString("read_later_news", gson.toJson(readLaterNewsList))
-                        editor.apply()
-                        Toast.makeText(this@NewsDetailsActivity, "Saved for later", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<NewsData>, t: Throwable) {
-                // Handle failure
-            }
-        })
-    }
-
     private fun addReadHistory(newsId: Int) {
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val memId = sharedPreferences.getInt("memId", -1)
@@ -414,4 +390,52 @@ class NewsDetailsActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkIfSavedForLater(memId: Int, newsId: Int) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        apiService.getReadLaterByMemId(memId).enqueue(object : Callback<List<Read_LaterData>> {
+            override fun onResponse(call: Call<List<Read_LaterData>>, response: Response<List<Read_LaterData>>) {
+                if (response.isSuccessful) {
+                    val readLaterList = response.body() ?: emptyList()
+                    isSavedForLater = readLaterList.any { it.newsId == newsId }
+                    updateSaveForLaterButton()
+                } else {
+                    Toast.makeText(this@NewsDetailsActivity, "ไม่สามารถตรวจสอบสถานะข่าวอ่านภายหลังได้", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Read_LaterData>>, t: Throwable) {
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการตรวจสอบสถานะข่าวอ่านภายหลัง: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun saveOrRemoveNewsForLater(memId: Int, newsId: Int) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        val readLaterData = Read_LaterData(memId, newsId)
+
+        apiService.postReadLater(readLaterData).enqueue(object : Callback<Read_LaterData> {
+            override fun onResponse(call: Call<Read_LaterData>, response: Response<Read_LaterData>) {
+                if (response.isSuccessful || response.code() == 201) {
+                    isSavedForLater = !isSavedForLater
+                    updateSaveForLaterButton()
+                    Toast.makeText(this@NewsDetailsActivity, if (isSavedForLater) "เพิ่มข่าวอ่านภายหลังสำเร็จ" else "ลบข่าวอ่านภายหลังสำเร็จ", Toast.LENGTH_SHORT).show()
+                } else {
+                    val errorMessage = response.errorBody()?.string()
+                    Toast.makeText(this@NewsDetailsActivity, "ไม่สามารถปรับสถานะข่าวอ่านภายหลังได้: $errorMessage", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Read_LaterData>, t: Throwable) {
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการปรับสถานะข่าวอ่านภายหลัง: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun updateSaveForLaterButton() {
+        if (isSavedForLater) {
+            saveForLaterButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_star))
+        } else {
+            saveForLaterButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_clock))
+        }
+    }
 }

@@ -51,8 +51,13 @@ interface ApiService {
         @Query("page") page: Int,
         @Query("limit") limit: Int
     ): Call<List<NewsData>>
+    //สำหรับ Read_History
     @GET("api/news/{id}")
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
+    //สำหรับ Read_Later
+    @GET("api/news/ids")
+    fun getNewsByIds(@Query("ids") ids: List<Int>): Call<List<NewsData>>
+
 
     //PictureData
     @GET("api/picture/news/{newsId}")
@@ -107,25 +112,20 @@ interface ApiService {
     fun deleteFavoriteCategory(@Path("id") memId: Int): Call<Void>
 
     //Read_LaterData
-    @GET("api/read_later")
-    fun getReadLater(): Call<List<Read_LaterData>>
-    @GET("api/read_later/{id}")
-    fun getReadLaterByMemId(@Path("id") memId: Int): Call<Read_LaterData>
     @POST("api/read_later")
     fun postReadLater(@Body readLater: Read_LaterData): Call<Read_LaterData>
-    @DELETE("api/read_later/{id}")
-    fun deleteReadLater(@Path("id") memId: Int): Call<Void>
+
+    @DELETE("api/read_later")
+    fun deleteReadLater(@Body readLater: Read_LaterData): Call<Void>
+
+    @GET("api/read_later/{id}")
+    fun getReadLaterByMemId(@Path("id") memId: Int): Call<List<Read_LaterData>>
 
     //Read_HistoryData
-    @GET("api/read_history")
-    fun getReadHistory(): Call<List<Read_HistoryData>>
-
     @GET("api/read_history/{memId}")
     fun getReadHistoryByMemId(@Path("memId") memId: Int): Call<List<Read_HistoryData>>
-
     @POST("api/read_history")
     fun addReadHistory(@Body readHistory: Read_HistoryData): Call<Void>
-
     @DELETE("api/read_history/{memId}/{newsId}")
     fun deleteReadHistory(@Path("memId") memId: Int, @Path("newsId") newsId: Int): Call<Void>
 
