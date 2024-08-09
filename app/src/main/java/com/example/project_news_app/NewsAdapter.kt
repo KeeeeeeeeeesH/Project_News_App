@@ -15,6 +15,7 @@ import com.example.project_news_app.NewsDetailsActivity
 import com.example.project_news_app.R
 import com.example.project_news_app.ReadHistoryWithNewsData
 import com.example.project_news_app.ReadLaterActivity
+import com.example.project_news_app.ReadLaterWithNewsData
 import com.example.project_news_app.VisitHistoryActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,6 +46,7 @@ class NewsAdapter(
         val item = newsList[position]
 
         if (isVisitHistory && item is ReadHistoryWithNewsData) {
+            // ระบบประวัติการอ่าน
             holder.newsName.text = item.newsName
 
             // Format date
@@ -90,7 +92,55 @@ class NewsAdapter(
                     .show()
                 true
             }
+        } else if (isReadLater && item is ReadLaterWithNewsData) {
+            // ระบบข่าวอ่านภายหลัง
+            holder.newsName.text = item.newsName
+
+            // Format date
+            val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+            val formattedDate = targetFormat.format(item.dateAdded)
+
+            holder.newsDate.text = formattedDate
+            holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"
+            holder.newsRating.text = "★ %.2f".format(item.ratingScore)
+
+            // Load cover image if available
+            if (!item.coverImage.isNullOrEmpty()) {
+                Glide.with(holder.itemView.context)
+                    .load(item.coverImage)
+                    .into(holder.newsPicture)
+            } else {
+                holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon) // รูป placeholder_image ต้องอยู่ใน drawable
+            }
+
+            // Set click listener to open NewsDetailsActivity
+            holder.itemView.setOnClickListener {
+                val intent = Intent(holder.itemView.context, NewsDetailsActivity::class.java)
+                intent.putExtra("news_id", item.newsId)
+                holder.itemView.context.startActivity(intent)
+            }
+
+            // Set long click listener to delete from read later
+            holder.itemView.setOnLongClickListener {
+                AlertDialog.Builder(holder.itemView.context)
+                    .setTitle("ลบข่าวอ่านภายหลัง")
+                    .setMessage("คุณต้องการลบข่าวนี้จากรายการอ่านภายหลังหรือไม่?")
+                    .setPositiveButton("ใช่") { dialog, _ ->
+                        val sharedPreferences = holder.itemView.context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                        val memId = sharedPreferences.getInt("memId", -1)
+                        if (memId != -1 && holder.itemView.context is ReadLaterActivity) {
+                            (holder.itemView.context as ReadLaterActivity).deleteReadLater(memId, item.newsId)
+                        }
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("ไม่") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+                true
+            }
         } else if (item is NewsData) {
+            // ระบบข่าวทั่วไป
             holder.newsName.text = item.newsName
 
             // Format date

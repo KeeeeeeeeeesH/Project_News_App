@@ -94,6 +94,15 @@ data class Read_LaterData(
     @SerializedName("News_Id") val newsId: Int
 )
 
+data class ReadLaterWithNewsData(
+    val newsId: Int,
+    val dateAdded: Date,
+    var readCount: Int,
+    val newsName: String,
+    var ratingScore: Float,
+    var coverImage: String
+)
+
 
 data class Read_HistoryData(
     @SerializedName("Mem_Id") val memId: Int,

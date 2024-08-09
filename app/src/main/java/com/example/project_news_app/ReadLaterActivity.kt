@@ -21,6 +21,11 @@ class ReadLaterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_later)
 
+        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
+
         readLaterRecyclerView = findViewById(R.id.read_later_recycler_view)
         readLaterRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -31,20 +36,20 @@ class ReadLaterActivity : AppCompatActivity() {
         memId = sharedPreferences.getInt("memId", -1)
 
         if (memId != -1) {
-            fetchReadLaterNews(memId)
+            fetchReadLaterNews()
         } else {
-            Toast.makeText(this, "ไม่พบ Member ID", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "ไม่พบข้อมูลสมาชิก", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun fetchReadLaterNews(memId: Int) {
+    private fun fetchReadLaterNews() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getReadLaterByMemId(memId).enqueue(object : Callback<List<Read_LaterData>> {
             override fun onResponse(call: Call<List<Read_LaterData>>, response: Response<List<Read_LaterData>>) {
                 if (response.isSuccessful) {
                     val readLaterList = response.body() ?: listOf()
                     if (readLaterList.isNotEmpty()) {
-                        fetchNewsData(readLaterList.map { it.newsId })
+                        fetchNewsData(readLaterList)
                     } else {
                         Toast.makeText(this@ReadLaterActivity, "ไม่มีข่าวในรายการอ่านภายหลัง", Toast.LENGTH_SHORT).show()
                     }
@@ -59,15 +64,37 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
-    private fun fetchNewsData(newsIds: List<Int>) {
+
+    private fun fetchNewsData(readLaterList: List<Read_LaterData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        apiService.getNewsByIds(newsIds).enqueue(object : Callback<List<NewsData>> {
-            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
+        apiService.getAllNews().enqueue(object : Callback<List<NewsData>> {
+            override fun onResponse(
+                call: Call<List<NewsData>>,
+                response: Response<List<NewsData>>
+            ) {
                 if (response.isSuccessful) {
-                    val newsList = response.body() ?: listOf()
-                    newsAdapter.setNews(newsList)
+                    val newsList = response.body() ?: emptyList()
+                    val readLaterWithNewsList = readLaterList.mapNotNull { readLater ->
+                        val news = newsList.find { it.newsId == readLater.newsId }
+                        news?.let {
+                            ReadLaterWithNewsData(
+                                newsId = it.newsId,
+                                dateAdded = it.dateAdded,
+                                newsName = it.newsName,
+                                ratingScore = 0f, // Default value, will be updated later
+                                coverImage = "",
+                                readCount = 0 // Default value, will be updated later
+                            )
+                        }
+                    }
+                    // Call the next steps to update read count and ratings
+                    fetchReadCounts(readLaterWithNewsList)
                 } else {
-                    Toast.makeText(this@ReadLaterActivity, "ไม่สามารถดึงข้อมูลข่าวได้", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@ReadLaterActivity,
+                        "ไม่สามารถดึงข้อมูลข่าวได้",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -77,14 +104,88 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
+
+    private fun fetchReadCounts(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
+            override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
+                if (response.isSuccessful) {
+                    val readCounts = response.body() ?: listOf()
+                    readLaterWithNewsList.forEach { news ->
+                        news.readCount = readCounts.count { it.newsId == news.newsId }
+                    }
+                    fetchRatings(readLaterWithNewsList)
+                } else {
+                    Toast.makeText(this@ReadLaterActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
+                Toast.makeText(this@ReadLaterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun fetchRatings(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
+            override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
+                if (response.isSuccessful) {
+                    val ratings = response.body() ?: listOf()
+                    readLaterWithNewsList.forEach { news ->
+                        val newsRatings = ratings.filter { it.newsId == news.newsId }
+                        news.ratingScore = if (newsRatings.isNotEmpty()) {
+                            newsRatings.sumByDouble { it.ratingScore.toDouble() }.toFloat() / newsRatings.size
+                        } else {
+                            0f
+                        }
+                    }
+                    fetchCoverImages(readLaterWithNewsList)
+                } else {
+                    Toast.makeText(this@ReadLaterActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
+                Toast.makeText(this@ReadLaterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+
+    private fun fetchCoverImages(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        readLaterWithNewsList.forEach { news ->
+            apiService.getCoverImage(news.newsId).enqueue(object : Callback<List<PictureData>> {
+                override fun onResponse(call: Call<List<PictureData>>, response: Response<List<PictureData>>) {
+                    if (response.isSuccessful) {
+                        val pictures = response.body() ?: listOf()
+                        val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
+                        news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@ReadLaterActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
+                        newsAdapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(this@ReadLaterActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
+                    Toast.makeText(this@ReadLaterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+        newsAdapter.setNews(readLaterWithNewsList) // Add this line
+    }
+
+
     fun deleteReadLater(memId: Int, newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        val readLaterData = Read_LaterData(memId, newsId)
+        val call = apiService.deleteReadLater(memId, newsId)
 
-        apiService.deleteReadLater(readLaterData).enqueue(object : Callback<Void> {
+        call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    fetchReadLaterNews(memId)
+                    Toast.makeText(this@ReadLaterActivity, "ลบข่าวออกจากรายการอ่านภายหลังเรียบร้อย", Toast.LENGTH_SHORT).show()
+                    fetchReadLaterNews()
                 } else {
                     Toast.makeText(this@ReadLaterActivity, "ไม่สามารถลบข่าวออกจากรายการอ่านภายหลังได้", Toast.LENGTH_SHORT).show()
                 }
@@ -96,3 +197,5 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 }
+
+

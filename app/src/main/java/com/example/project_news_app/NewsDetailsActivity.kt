@@ -413,8 +413,8 @@ class NewsDetailsActivity : AppCompatActivity() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val readLaterData = Read_LaterData(memId, newsId)
 
-        apiService.postReadLater(readLaterData).enqueue(object : Callback<Read_LaterData> {
-            override fun onResponse(call: Call<Read_LaterData>, response: Response<Read_LaterData>) {
+        apiService.postReadLater(readLaterData).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful || response.code() == 201) {
                     isSavedForLater = !isSavedForLater
                     updateSaveForLaterButton()
@@ -425,11 +425,12 @@ class NewsDetailsActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<Read_LaterData>, t: Throwable) {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
                 Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการปรับสถานะข่าวอ่านภายหลัง: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
+
 
     private fun updateSaveForLaterButton() {
         if (isSavedForLater) {

@@ -1,5 +1,6 @@
 package com.example.project_news_app
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ class VisitHistoryActivity : AppCompatActivity() {
 
     private lateinit var visitHistoryRecyclerView: RecyclerView
     private lateinit var newsAdapter: NewsAdapter
+    private var memId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,18 +35,17 @@ class VisitHistoryActivity : AppCompatActivity() {
         newsAdapter = NewsAdapter(listOf(), isVisitHistory = true)
         visitHistoryRecyclerView.adapter = newsAdapter
 
-        fetchReadHistory()
+        val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        memId = sharedPreferences.getInt("memId", -1)
+
+        if (memId != -1) {
+            fetchReadHistory()
+        } else {
+            Toast.makeText(this, "ไม่พบข้อมูลสมาชิก", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun fetchReadHistory() {
-        val sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE)
-        val memId = sharedPreferences.getInt("memId", -1)
-
-        if (memId == -1) {
-            Toast.makeText(this, "ไม่พบ Member ID", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getReadHistoryByMemId(memId).enqueue(object : Callback<List<Read_HistoryData>> {
             override fun onResponse(call: Call<List<Read_HistoryData>>, response: Response<List<Read_HistoryData>>) {
