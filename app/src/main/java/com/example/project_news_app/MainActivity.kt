@@ -1,13 +1,13 @@
 package com.example.project_news_app
 
+import NetworkUtil
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,11 +15,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.project_news_app.adapters.CategoryAdapter
 import com.example.project_news_app.adapters.NewsAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.text.SimpleDateFormat
-import java.util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             categoryAdapter.setSelectedCategory(category.catId)
             loadNewsByCategory(category.catId)
         }
-        newsAdapter = NewsAdapter(listOf())
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.GENERAL)
 
         categoriesRecyclerView.adapter = categoryAdapter
         newsRecyclerView.adapter = newsAdapter
@@ -77,7 +79,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_favorite -> {
-                    startActivity(Intent(this, FavoriteActivity::class.java))
+                    startActivity(Intent(this, SelectFavoriteActivity::class.java))
                     true
                 }
                 R.id.navigation_profile -> {
@@ -117,10 +119,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onToggleCategoriesClick() {
-
+        // Implementation of toggle categories
     }
 
     private fun loadCategories() {
+        if (!NetworkUtil.isInternetAvailable(this)) {
+            showNoInternetError()
+            swipeRefreshLayout.isRefreshing = false
+            return
+        }
+
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
@@ -146,6 +154,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadMoreNews() {
+        if (!NetworkUtil.isInternetAvailable(this)) {
+            showNoInternetError()
+            swipeRefreshLayout.isRefreshing = false
+            return
+        }
+
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getNewsByCategoryPaged(currentCategoryId, currentPage, 5).enqueue(object : Callback<List<NewsData>> {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
@@ -366,4 +380,14 @@ class MainActivity : AppCompatActivity() {
         // Reload the data when coming back to this activity
         loadNewsByCategory(currentCategoryId)
     }
+
+    private fun showNoInternetError() {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("ไม่มีการเชื่อมต่ออินเทอร์เน็ต")
+            .setMessage("ไม่สามารถโหลดรายการข่าวได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ")
+            .setPositiveButton("ตกลง", null)
+            .create()
+        dialog.show()
+    }
 }
+

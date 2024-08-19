@@ -29,7 +29,7 @@ class ReadLaterActivity : AppCompatActivity() {
         readLaterRecyclerView = findViewById(R.id.read_later_recycler_view)
         readLaterRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        newsAdapter = NewsAdapter(listOf(), isReadLater = true)
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.READ_LATER)
         readLaterRecyclerView.adapter = newsAdapter
 
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
@@ -64,14 +64,10 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
-
     private fun fetchNewsData(readLaterList: List<Read_LaterData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getAllNews().enqueue(object : Callback<List<NewsData>> {
-            override fun onResponse(
-                call: Call<List<NewsData>>,
-                response: Response<List<NewsData>>
-            ) {
+            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body() ?: emptyList()
                     val readLaterWithNewsList = readLaterList.mapNotNull { readLater ->
@@ -90,11 +86,7 @@ class ReadLaterActivity : AppCompatActivity() {
                     // Call the next steps to update read count and ratings
                     fetchReadCounts(readLaterWithNewsList)
                 } else {
-                    Toast.makeText(
-                        this@ReadLaterActivity,
-                        "ไม่สามารถดึงข้อมูลข่าวได้",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@ReadLaterActivity, "ไม่สามารถดึงข้อมูลข่าวได้", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -103,7 +95,6 @@ class ReadLaterActivity : AppCompatActivity() {
             }
         })
     }
-
 
     private fun fetchReadCounts(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
@@ -152,7 +143,6 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
-
     private fun fetchCoverImages(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         readLaterWithNewsList.forEach { news ->
@@ -175,27 +165,7 @@ class ReadLaterActivity : AppCompatActivity() {
         }
         newsAdapter.setNews(readLaterWithNewsList) // Add this line
     }
-
-
-    fun deleteReadLater(memId: Int, newsId: Int) {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        val call = apiService.deleteReadLater(memId, newsId)
-
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    Toast.makeText(this@ReadLaterActivity, "ลบข่าวออกจากรายการอ่านภายหลังเรียบร้อย", Toast.LENGTH_SHORT).show()
-                    fetchReadLaterNews()
-                } else {
-                    Toast.makeText(this@ReadLaterActivity, "ไม่สามารถลบข่าวออกจากรายการอ่านภายหลังได้", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาดในการลบข่าวออกจากรายการอ่านภายหลัง: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
 }
+
 
 

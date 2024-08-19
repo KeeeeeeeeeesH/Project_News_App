@@ -72,7 +72,7 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_favorite -> {
-                    startActivity(Intent(this, FavoriteActivity::class.java))
+                    startActivity(Intent(this, SelectFavoriteActivity::class.java))
                     true
                 }
                 R.id.navigation_profile -> {

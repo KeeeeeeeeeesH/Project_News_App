@@ -2,10 +2,10 @@ package com.example.project_news_app
 
 import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -15,8 +15,6 @@ interface ApiService {
     //LoginRequest
     @POST("api/loginMember/login")
     fun loginMember(@Body request: LoginRequest): Call<LoginResponse>
-//    @POST("api/loginAdmin/login")
-//    fun loginAdmin(@Body request: LoginRequest): Call<AdminLoginResponse>
 
     //OTP Request/Verify + ResetPassword
     @POST("api/recovery_member/request-otp")
@@ -43,8 +41,12 @@ interface ApiService {
     //NewsData
     @GET("api/news")
     fun getAllNews(): Call<List<NewsData>>
-    @GET("api/news/category/{id}")
-    fun getNewsByCategory(@Path("id") catId: Int): Call<List<NewsData>>
+    @GET("api/news/categories")
+    fun getNewsByCategories(
+        @Query("ids") ids: List<Int>,
+        @Query("page") page: Int,
+        @Query("limit") limit: Int
+    ): Call<List<NewsData>>
     @GET("api/news/category/{id}")
     fun getNewsByCategoryPaged(
         @Path("id") catId: Int,
@@ -53,9 +55,6 @@ interface ApiService {
     ): Call<List<NewsData>>
     @GET("api/news/{id}")
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
-    @GET("api/news/ids")
-    fun getNewsByIds(@Query("ids") ids: List<Int>): Call<List<NewsData>>
-
 
 
     //PictureData
@@ -77,8 +76,6 @@ interface ApiService {
     //Total_ReadData
     @GET("api/total_read")
     fun getTotalRead(): Call<List<Total_ReadData>>
-    @GET("api/total_read/{id}")
-    fun getTotalReadById(@Path("id") countId: Int): Call<Total_ReadData>
     @POST("api/total_read")
     fun postTotalRead(@Body totalRead: Total_ReadData): Call<Total_ReadData>
 
@@ -95,30 +92,22 @@ interface ApiService {
     fun getNewsSubCateByNewsId(@Path("newsId") newsId: Int): Call<List<News_Sub_CateData>>
 
     //MajorData
-    @GET("api/major")
-    fun getMajor(): Call<List<MajorData>>
     @GET("api/major/{id}")
     fun getMajorById(@Path("id") majorId: Int): Call<MajorData>
 
     //Favorite_CategoryData
-    @GET("api/favorite_category")
-    fun getFavoriteCategory(): Call<List<Favorite_CategoryData>>
     @GET("api/favorite_category/{id}")
-    fun getFavoriteCategoryByMemId(@Path("id") memId: Int): Call<Favorite_CategoryData>
-    @POST("api/favorite_category")
-    fun postFavoriteCategory(@Body favorite: Favorite_CategoryData): Call<Favorite_CategoryData>
-    @DELETE("api/favorite_category/{id}")
-    fun deleteFavoriteCategory(@Path("id") memId: Int): Call<Void>
+    fun getFavoriteCategoryByMemId(@Path("id") memId: Int): Call<List<Favorite_CategoryData>>
+    @POST("api/favorite_category/update")
+    fun updateFavoriteCategories(@Body updateRequest: UpdateFavoriteCategoriesRequest): Call<Void>
+    @GET("api/favorite_category/news")
+    fun getNewsByFavoriteCategory(@Query("memId") memId: Int): Call<List<NewsData>>
 
     //Read_LaterData
     @GET("api/read_later/{memId}")
     fun getReadLaterByMemId(@Path("memId") memId: Int): Call<List<Read_LaterData>>
     @POST("api/read_later")
     fun postReadLater(@Body readLater: Read_LaterData): Call<Void>
-
-    @DELETE("api/read_later/{memId}/{newsId}")
-    fun deleteReadLater(@Path("memId") memId: Int, @Path("newsId") newsId: Int): Call<Void>
-
 
     //Read_HistoryData
     @GET("api/read_history/{memId}")
@@ -127,7 +116,5 @@ interface ApiService {
     fun addReadHistory(@Body readHistory: Read_HistoryData): Call<Void>
     @DELETE("api/read_history/{memId}/{newsId}")
     fun deleteReadHistory(@Path("memId") memId: Int, @Path("newsId") newsId: Int): Call<Void>
-
-
 }
 

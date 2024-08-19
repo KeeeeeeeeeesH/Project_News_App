@@ -1,9 +1,8 @@
 package com.example.project_news_app
 
-import java.util.Date
 import com.google.gson.annotations.SerializedName
-import java.sql.Time
 import java.sql.Timestamp
+import java.util.Date
 
 data class LoginRequest(
     val login: String,
@@ -89,6 +88,11 @@ data class Favorite_CategoryData(
     @SerializedName("Cat_Id") val catId: Int
 )
 
+data class UpdateFavoriteCategoriesRequest(
+    @SerializedName("Mem_Id") val memId: Int,
+    @SerializedName("Cat_Ids") val catIds: List<Int>
+)
+
 data class Read_LaterData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("News_Id") val newsId: Int
@@ -102,7 +106,6 @@ data class ReadLaterWithNewsData(
     var ratingScore: Float,
     var coverImage: String
 )
-
 
 data class Read_HistoryData(
     @SerializedName("Mem_Id") val memId: Int,
@@ -118,7 +121,6 @@ data class ReadHistoryWithNewsData(
     var ratingScore: Float,
     var coverImage: String
 )
-
 
 data class Total_ReadData(
     @SerializedName("Count_Id") val countId: Int,

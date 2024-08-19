@@ -7,12 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project_news_app.adapters.NewsAdapter
-import com.google.gson.Gson
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.sql.Timestamp
 
 class VisitHistoryActivity : AppCompatActivity() {
 
@@ -32,7 +29,7 @@ class VisitHistoryActivity : AppCompatActivity() {
         visitHistoryRecyclerView = findViewById(R.id.visit_history_recycler_view)
         visitHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        newsAdapter = NewsAdapter(listOf(), isVisitHistory = true)
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.VISIT_HISTORY)
         visitHistoryRecyclerView.adapter = newsAdapter
 
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
@@ -161,7 +158,7 @@ class VisitHistoryActivity : AppCompatActivity() {
                 }
             })
         }
-        newsAdapter.setNews(readHistoryWithNewsList) // Add this line
+        newsAdapter.setNews(readHistoryWithNewsList)
     }
 
     // Function to delete read history
@@ -185,5 +182,6 @@ class VisitHistoryActivity : AppCompatActivity() {
         })
     }
 }
+
 
 
