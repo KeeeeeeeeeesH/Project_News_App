@@ -2,6 +2,8 @@ package com.example.project_news_app
 
 import NetworkUtil
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -9,6 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -116,6 +120,13 @@ class MainActivity : AppCompatActivity() {
         swipeRefreshLayout.setOnRefreshListener {
             loadNewsByCategory(currentCategoryId)
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+            }
+        }
+
     }
 
     private fun onToggleCategoriesClick() {
@@ -175,10 +186,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     fetchReadCounts(newsList)
                     currentPage++
-                    swipeRefreshLayout.isRefreshing = false // Stop the refreshing indicator
+                    swipeRefreshLayout.isRefreshing = false
                 } else {
                     Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
-                    swipeRefreshLayout.isRefreshing = false // Stop the refreshing indicator
+                    swipeRefreshLayout.isRefreshing = false
                 }
             }
 
@@ -389,5 +400,6 @@ class MainActivity : AppCompatActivity() {
             .create()
         dialog.show()
     }
+
 }
 
