@@ -434,9 +434,9 @@ class NewsDetailsActivity : AppCompatActivity() {
 
     private fun updateSaveForLaterButton() {
         if (isSavedForLater) {
-            saveForLaterButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_star))
+            saveForLaterButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.bookmark_24px))
         } else {
-            saveForLaterButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_clock))
+            saveForLaterButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.bookmark_add_24px))
         }
     }
 }

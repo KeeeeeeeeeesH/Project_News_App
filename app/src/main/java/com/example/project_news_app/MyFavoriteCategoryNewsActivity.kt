@@ -3,6 +3,7 @@ package com.example.project_news_app
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +21,9 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
     private lateinit var favoriteNewsRecyclerView: RecyclerView
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var selectedCategoriesTextView: TextView
     private var memId: Int = -1
+    private val categoryMap = mutableMapOf<Int, String>()  // เก็บ catId และ catName
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,17 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         // ซ่อน Title ที่มากับ Toolbar เพื่อใช้ TextView ตรงกลางแทน
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        // การกำหนดค่า UI Components
+        selectedCategoriesTextView = findViewById(R.id.selected_categories_text_view)
+        favoriteNewsRecyclerView = findViewById(R.id.recycler_view)
+        bottomNavigation = findViewById(R.id.bottom_navigation)
+
+        favoriteNewsRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.FAVORITE)
+        favoriteNewsRecyclerView.adapter = newsAdapter
+
+        // การตั้งค่าปุ่มลอยเพื่อแก้ไขหมวดหมู่
         val editButton: FloatingActionButton = findViewById(R.id.edit_button)
         editButton.setOnClickListener {
             val intent = Intent(this, SelectFavoriteActivity::class.java)
@@ -40,13 +54,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        favoriteNewsRecyclerView = findViewById(R.id.recycler_view)
-        bottomNavigation = findViewById(R.id.bottom_navigation)
-        favoriteNewsRecyclerView.layoutManager = LinearLayoutManager(this)
-
-        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.FAVORITE)
-        favoriteNewsRecyclerView.adapter = newsAdapter
-
+        // การตั้งค่าปุ่มนำทางล่าง
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
@@ -64,14 +72,37 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             }
         }
 
+        // ดึง memId จาก SharedPreferences
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         memId = sharedPreferences.getInt("memId", -1)
 
         if (memId != -1) {
+            fetchAllCategories() // ดึงหมวดหมู่ทั้งหมดก่อน
             fetchFavoriteNews()
+            fetchSelectedCategories(memId)
         } else {
             Toast.makeText(this, "ไม่พบข้อมูลสมาชิก", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun fetchAllCategories() {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
+            override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
+                if (response.isSuccessful) {
+                    val categories = response.body()
+                    categories?.forEach { category ->
+                        categoryMap[category.catId] = category.catName
+                    }
+                } else {
+                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดข้อมูลหมวดหมู่ได้", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<CategoryData>>, t: Throwable) {
+                Toast.makeText(this@MyFavoriteCategoryNewsActivity, "เกิดข้อผิดพลาดในการโหลดข้อมูลหมวดหมู่", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun fetchFavoriteNews() {
@@ -106,6 +137,29 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                 ).show()
             }
         })
+    }
+
+    private fun fetchSelectedCategories(memId: Int) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        apiService.getFavoriteCategoryByMemId(memId).enqueue(object : Callback<List<Favorite_CategoryData>> {
+            override fun onResponse(call: Call<List<Favorite_CategoryData>>, response: Response<List<Favorite_CategoryData>>) {
+                if (response.isSuccessful) {
+                    val categories = response.body()
+                    val categoryNames = categories?.joinToString(", ") { getCategoryNameById(it.catId) }
+                    selectedCategoriesTextView.text = "หมวดหมู่ที่เลือก: $categoryNames"
+                } else {
+                    selectedCategoriesTextView.text = "ไม่สามารถโหลดหมวดหมู่ได้"
+                }
+            }
+
+            override fun onFailure(call: Call<List<Favorite_CategoryData>>, t: Throwable) {
+                selectedCategoriesTextView.text = "เกิดข้อผิดพลาดในการโหลดหมวดหมู่"
+            }
+        })
+    }
+
+    private fun getCategoryNameById(catId: Int): String {
+        return categoryMap[catId] ?: "Unknown Category"  // ส่งคืนชื่อหมวดหมู่ตาม catId หรือส่งคืน "Unknown Category" ถ้าไม่พบ
     }
 
     private fun fetchAdditionalNewsData(newsList: List<NewsData>) {
@@ -180,7 +234,6 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         newsAdapter.setNews(newsList)
     }
 }
-
 
 
 
