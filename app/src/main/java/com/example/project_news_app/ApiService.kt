@@ -82,13 +82,13 @@ interface ApiService {
     //Sub_CategoryData
     @GET("api/sub_category")
     fun getSubcategory(): Call<List<Sub_CategoryData>>
-    @GET("api/sub_category/ids")
+    @GET("api/sub_category/tag/ids")
     fun getSubcategoriesByIds(@Query("ids") ids: List<Int>): Call<List<Sub_CategoryData>>
 
     //News_Sub_CateData
     @GET("api/news_sub_cate")
     fun getNewsSubCate(): Call<List<News_Sub_CateData>>
-    @GET("api/news_sub_cate/{newsId}")
+    @GET("api/news_sub_cate/tag/{newsId}")
     fun getNewsSubCateByNewsId(@Path("newsId") newsId: Int): Call<List<News_Sub_CateData>>
 
     //MajorData
