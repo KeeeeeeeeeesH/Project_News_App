@@ -3,14 +3,7 @@ package com.example.project_news_app
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import java.text.SimpleDateFormat
@@ -20,19 +13,27 @@ class SearchNewsActivity : AppCompatActivity() {
 
     private lateinit var searchByNameEditText: EditText
     private lateinit var searchByDateEditText: EditText
+    private lateinit var startDateEditText: EditText
+    private lateinit var endDateEditText: EditText
     private lateinit var searchByNameButton: Button
     private lateinit var searchByDateButton: Button
-    private lateinit var timePeriodSpinner: Spinner
+    private lateinit var searchByDateRangeButton: Button
+
+    private var startDate: Date? = null
+    private var endDate: Date? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_news)
 
+        // Bind the views with findViewById
         searchByNameEditText = findViewById(R.id.search_by_name_edit_text)
         searchByDateEditText = findViewById(R.id.search_by_date_edit_text)
+        startDateEditText = findViewById(R.id.start_date_edit_text)
+        endDateEditText = findViewById(R.id.end_date_edit_text)
         searchByNameButton = findViewById(R.id.search_by_name_button)
         searchByDateButton = findViewById(R.id.search_by_date_button)
-        timePeriodSpinner = findViewById(R.id.time_period_spinner)
+        searchByDateRangeButton = findViewById(R.id.search_by_date_range_button)
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -44,14 +45,16 @@ class SearchNewsActivity : AppCompatActivity() {
             finish()
         }
 
-        // Set up the spinner with options
-        val timePeriods = arrayOf("เลือกช่วงเวลา", "ข่าวในสัปดาห์นี้", "1 สัปดาห์ที่แล้ว", "1 เดือนที่แล้ว", "6 เดือนที่แล้ว", "1 ปีที่แล้ว")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, timePeriods)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        timePeriodSpinner.adapter = adapter
-
         searchByDateEditText.setOnClickListener {
-            showDatePickerDialog()
+            showDatePickerDialog(false, true) // สำหรับเลือกวันที่เดียว
+        }
+
+        startDateEditText.setOnClickListener {
+            showDatePickerDialog(true, false) // สำหรับเลือกวันที่เริ่มต้น
+        }
+
+        endDateEditText.setOnClickListener {
+            showDatePickerDialog(false, false) // สำหรับเลือกวันที่สิ้นสุด
         }
 
         searchByNameButton.setOnClickListener {
@@ -78,24 +81,20 @@ class SearchNewsActivity : AppCompatActivity() {
             }
         }
 
-        timePeriodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                when (position) {
-                    1 -> searchNewsByTimePeriod("CURRENT_WEEK")
-                    2 -> searchNewsByTimePeriod("LAST_WEEK")
-                    3 -> searchNewsByTimePeriod("LAST_MONTH")
-                    4 -> searchNewsByTimePeriod("LAST_SIX_MONTHS")
-                    5 -> searchNewsByTimePeriod("LAST_YEAR")
+        searchByDateRangeButton.setOnClickListener {
+            if (startDate != null && endDate != null) {
+                if (startDate!!.before(endDate)) {
+                    searchNewsByDateRange(startDate!!, endDate!!)
+                } else {
+                    Toast.makeText(this, "วันที่เริ่มต้นต้องมาก่อนวันที่สิ้นสุด", Toast.LENGTH_SHORT).show()
                 }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // Do nothing
+            } else {
+                Toast.makeText(this, "กรุณาเลือกวันที่เริ่มต้นและวันที่สิ้นสุด", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun showDatePickerDialog() {
+    private fun showDatePickerDialog(isStartDate: Boolean, isSingleDate: Boolean) {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
@@ -107,7 +106,21 @@ class SearchNewsActivity : AppCompatActivity() {
                 val selectedDate = Calendar.getInstance()
                 selectedDate.set(selectedYear, selectedMonth, selectedDay)
                 val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                searchByDateEditText.setText(dateFormat.format(selectedDate.time))
+                val dateStr = dateFormat.format(selectedDate.time)
+
+                when {
+                    isStartDate -> {
+                        startDateEditText.setText(dateStr)
+                        startDate = selectedDate.time
+                    }
+                    !isSingleDate -> {
+                        endDateEditText.setText(dateStr)
+                        endDate = selectedDate.time
+                    }
+                    else -> {
+                        searchByDateEditText.setText(dateStr)
+                    }
+                }
             },
             year, month, day
         )
@@ -116,7 +129,6 @@ class SearchNewsActivity : AppCompatActivity() {
     }
 
     private fun searchNewsByName(query: String) {
-        Log.d("SearchNewsActivity", "Search query: $query")
         val intent = Intent().apply {
             putExtra("SEARCH_QUERY", query)
             putExtra("SEARCH_TYPE", "NAME")
@@ -136,10 +148,14 @@ class SearchNewsActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun searchNewsByTimePeriod(period: String) {
+    private fun searchNewsByDateRange(startDate: Date, endDate: Date) {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val startDateString = dateFormat.format(startDate)
+        val endDateString = dateFormat.format(endDate)
         val intent = Intent().apply {
-            putExtra("SEARCH_QUERY", period)
-            putExtra("SEARCH_TYPE", "PERIOD")
+            putExtra("START_DATE", startDateString)
+            putExtra("END_DATE", endDateString)
+            putExtra("SEARCH_TYPE", "DATE_RANGE")
         }
         setResult(RESULT_OK, intent)
         finish()
@@ -150,6 +166,6 @@ class SearchNewsActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         finish()
-        super.onBackPressed() // Add this line to call the super method
+        super.onBackPressed()
     }
 }
