@@ -2,6 +2,7 @@ package com.example.project_news_app
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -11,9 +12,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        val title = remoteMessage.notification?.title ?: "ข่าวสำคัญ"
-        val message = remoteMessage.notification?.body ?: "เนื้อหาใหม่"
-        showNotification(title, message)
+        // ตรวจสอบว่าได้รับข้อความจาก FCM
+        Log.d("FCM", "From: ${remoteMessage.from}")
+
+        if (remoteMessage.notification != null) {
+            val title = remoteMessage.notification?.title ?: "ข่าวสำคัญ"
+            val message = remoteMessage.notification?.body ?: "เนื้อหาใหม่"
+            showNotification(title, message)
+        } else {
+            Log.d("FCM", "Message data payload: ${remoteMessage.data}")
+        }
     }
 
     private fun showNotification(title: String, message: String) {
