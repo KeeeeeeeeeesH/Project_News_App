@@ -287,22 +287,50 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_REQUEST_CODE && resultCode == RESULT_OK) {
-            val query = data?.getStringExtra("SEARCH_QUERY") ?: return
-            val searchType = data.getStringExtra("SEARCH_TYPE")
-
+            val searchType = data?.getStringExtra("SEARCH_TYPE")
             when (searchType) {
-                "NAME" -> searchNews(query)
-                "DATE" -> searchNewsByDate(query)
-                "PERIOD" -> searchNewsByPeriod(query)
+                "NAME" -> {
+                    val query = data.getStringExtra("SEARCH_QUERY") ?: return
+                    searchNews(query)
+                }
+                "DATE" -> {
+                    val query = data.getStringExtra("SEARCH_QUERY") ?: return
+                    searchNewsByDate(query)
+                }
+                "DATE_RANGE" -> {
+                    val startDateStr = data?.getStringExtra("START_DATE")
+                    val endDateStr = data?.getStringExtra("END_DATE")
+                    if (startDateStr != null && endDateStr != null) {
+                        searchNewsByDateRange(startDateStr, endDateStr)
+                    }
+                }
+                "PERIOD" -> {
+                    val period = data.getStringExtra("SEARCH_QUERY") ?: return
+                    searchNewsByPeriod(period)
+                }
             }
 
-            // เปลี่ยนแถบหมวดหมู่เป็น "ข่าวที่พบ"
             findViewById<View>(R.id.categories_container).visibility = View.GONE
             foundNewsContainer.visibility = View.VISIBLE
 
             // เอาปุ่มค้นหาออก
             findViewById<View>(R.id.search_bar_container).visibility = View.GONE
         }
+    }
+
+    private fun clearSearchResults() {
+        newsAdapter.setNews(listOf()) // ตั้งค่า Adapter ให้แสดงรายการว่างเพื่อเคลียร์ผลการค้นหา
+    }
+
+    private fun searchNewsByDateRange(startDateStr: String, endDateStr: String) {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val startDate = dateFormat.parse(startDateStr)
+        val endDate = dateFormat.parse(endDateStr)
+
+        val filteredNewsList = allNewsList.filter {
+            it.dateAdded != null && it.dateAdded.after(startDate) && it.dateAdded.before(endDate)
+        }
+        newsAdapter.setNews(filteredNewsList)
     }
 
     private fun searchNews(query: String) {
@@ -384,9 +412,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (foundNewsContainer.visibility == View.VISIBLE) {
+            clearSearchResults()
             // ถ้าอยู่ในหน้าข่าวที่พบ ให้กลับไปที่หน้าค้นหา
             val intent = Intent(this, SearchNewsActivity::class.java)
             startActivity(intent)
+
         } else {
             super.onBackPressed()
         }
@@ -396,12 +426,6 @@ class MainActivity : AppCompatActivity() {
         private const val SEARCH_REQUEST_CODE = 1
     }
 
-    // Reload activity
-    override fun onResume() {
-        super.onResume()
-        // Reload the data when coming back to this activity
-        loadNewsByCategory(currentCategoryId)
-    }
 
     private fun showNoInternetError() {
         val dialog = AlertDialog.Builder(this)
