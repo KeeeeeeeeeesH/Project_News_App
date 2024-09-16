@@ -118,13 +118,15 @@
                 android:textStyle="bold"
                 android:layout_marginTop="16dp" />
 
-            <Spinner
-                android:id="@+id/rating_spinner"
-                android:layout_width="150dp"
+            <!-- RatingBar for Rating -->
+            <RatingBar
+                android:id="@+id/rating_bar"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:minHeight="48dp"
-                android:padding="8dp" />
+                android:numStars="5"
+                android:stepSize="0.5"
+                android:rating="0"
+                android:layout_marginTop="8dp" />
 
             <Button
                 android:id="@+id/submit_rating_button"
@@ -133,7 +135,8 @@
                 android:text="ส่งคะแนน"
                 android:layout_marginTop="16dp"
                 android:backgroundTint="#6200EE"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                android:layout_gravity="center" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

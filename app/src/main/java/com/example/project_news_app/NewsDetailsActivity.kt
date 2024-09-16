@@ -21,6 +21,7 @@ import retrofit2.Response
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.widget.RatingBar
 
 class NewsDetailsActivity : AppCompatActivity() {
 
@@ -33,7 +34,7 @@ class NewsDetailsActivity : AppCompatActivity() {
     private lateinit var newsDetails: TextView
     private lateinit var newsSubCategory: TextView
     private lateinit var newsImagesContainer: LinearLayout
-    private lateinit var ratingSpinner: Spinner
+    private lateinit var ratingBar: RatingBar
     private lateinit var submitRatingButton: Button
     private lateinit var saveForLaterButton: ImageView
     private var isSavedForLater: Boolean = false
@@ -61,14 +62,9 @@ class NewsDetailsActivity : AppCompatActivity() {
         newsDetails = findViewById(R.id.news_details)
         newsSubCategory = findViewById(R.id.news_sub_category)
         newsImagesContainer = findViewById(R.id.news_images_container)
-        ratingSpinner = findViewById(R.id.rating_spinner)
+        ratingBar = findViewById(R.id.rating_bar) // Use RatingBar instead of Spinner
         submitRatingButton = findViewById(R.id.submit_rating_button)
         saveForLaterButton = findViewById(R.id.save_for_later_image)
-
-        val ratingOptions = listOf(0f, 0.5f, 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f)
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, ratingOptions)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        ratingSpinner.adapter = adapter
 
         newsId = intent.getIntExtra("news_id", -1)
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
@@ -93,7 +89,7 @@ class NewsDetailsActivity : AppCompatActivity() {
     }
 
     private fun submitRating(newsId: Int) {
-        val selectedRating = ratingSpinner.selectedItem.toString().toFloat()
+        val selectedRating = ratingBar.rating // Get rating from RatingBar
 
         // ดึง member ID จาก SharedPreferences
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
@@ -122,6 +118,7 @@ class NewsDetailsActivity : AppCompatActivity() {
                 }
             })
     }
+
 
     // Fetch news details from API
     private fun fetchNewsDetails(newsId: Int) {
