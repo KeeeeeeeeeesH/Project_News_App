@@ -25,7 +25,24 @@ data class ResetPasswordResponse(
 )
 data class PhoneNumberRequest(val phone: String)
 data class OtpRequest(val otp: String)
-data class OtpResponse(val success: Boolean, val message: String?)
+data class OtpResponse(
+    val message: String?,
+    val details: OtpDetails?
+)
+
+data class OtpDetails(
+    val code: String?,
+    val status: String?,
+    val msg: String?,
+    val credit_balance: Int?,
+    val result: OtpResult?
+)
+
+data class OtpResult(
+    val requestNo: String?,
+    val token: String?,
+    val ref: String?
+)
 
 
 data class MemberData(
