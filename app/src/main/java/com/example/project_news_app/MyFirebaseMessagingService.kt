@@ -33,7 +33,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.images)  // Replace with your app icon
+            .setSmallIcon(R.drawable.images)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
