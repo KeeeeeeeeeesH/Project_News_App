@@ -38,7 +38,6 @@ class RecoveryActivity : AppCompatActivity() {
             if (phoneNumber.isEmpty()) {
                 Toast.makeText(this, "Please enter your phone number", Toast.LENGTH_SHORT).show()
             } else {
-                // ยังคงทำการขอ OTP
                 requestOtp(phoneNumber)
             }
         }
@@ -63,8 +62,8 @@ class RecoveryActivity : AppCompatActivity() {
             override fun onResponse(call: Call<OtpResponse>, response: Response<OtpResponse>) {
                 val otpResponse = response.body()
 
-                // ตรวจสอบว่า OTP ส่งสำเร็จจากข้อความ msg ใน response body
-                if (otpResponse?.details?.msg == "[ACCEPTD] Message is in accepted state") {
+                // ตรวจสอบว่า response ไม่เป็น null และมีข้อความ success
+                if (otpResponse != null && otpResponse.message == "OTP ถูกส่งสำเร็จ") {
                     // ปลดล็อคการกรอก OTP และปุ่ม OK เมื่อ OTP ส่งสำเร็จ
                     otpEditText.isEnabled = true
                     okButton.isEnabled = true
@@ -73,7 +72,8 @@ class RecoveryActivity : AppCompatActivity() {
                     showOtpSentDialog()
                 } else {
                     // ถ้า response body ไม่ถูกต้อง แสดงข้อความว่า "Failed to send OTP"
-                    Toast.makeText(this@RecoveryActivity, otpResponse?.message ?: "Failed to send OTP", Toast.LENGTH_SHORT).show()
+                    val errorMessage = otpResponse?.message ?: "Failed to send OTP"
+                    Toast.makeText(this@RecoveryActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -93,13 +93,15 @@ class RecoveryActivity : AppCompatActivity() {
             override fun onResponse(call: Call<OtpResponse>, response: Response<OtpResponse>) {
                 val otpResponse = response.body()
 
-                if (otpResponse?.details?.msg == "[ACCEPTD] Message is in accepted state") {
+                // ตรวจสอบข้อความ message หรือ details จากการยืนยัน OTP
+                if (otpResponse?.message == "OTP ยืนยันสำเร็จ" || otpResponse?.details?.msg == "Verify Success") {
                     // ถ้า OTP ตรงกับที่ส่งไป นำผู้ใช้ไปยังหน้า Reset Password
                     val intent = Intent(this@RecoveryActivity, ResetPasswordActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
-                    Toast.makeText(this@RecoveryActivity, otpResponse?.message ?: "Invalid OTP", Toast.LENGTH_SHORT).show()
+                    val errorMessage = otpResponse?.message ?: "Invalid OTP"
+                    Toast.makeText(this@RecoveryActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -108,6 +110,7 @@ class RecoveryActivity : AppCompatActivity() {
             }
         })
     }
+
 
     // ฟังก์ชันแสดง dialog เมื่อ OTP ถูกส่งสำเร็จ
     private fun showOtpSentDialog() {
