@@ -1,6 +1,7 @@
 package com.example.project_news_app
 
 import NetworkUtil
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
     private var currentCategoryId: Int = 0 // Default ไปที่ "แนะนำ"
     private var currentPage: Int = 0 // index ของหน้าข่าวสำหรับการโหลดข่าวเพิ่ม
     private var allNewsList: List<NewsData> = listOf() // All news list
+    private var memId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -138,6 +140,20 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val memId = sharedPreferences.getInt("memId", -1)
+        if (memId != -1) {
+            FirebaseMessaging.getInstance().subscribeToTopic("user_$memId")
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("FCM", "Subscribed to user_$memId successfully")
+                    } else {
+                        Log.d("FCM", "Failed to subscribe to user_$memId")
+                    }
+                }
+        } else {
+            Log.e("FCM", "Failed to retrieve memId for subscribing to user topic")
+        }
     }
 
     private fun onToggleCategoriesClick() {

@@ -12,19 +12,20 @@ class MyApplication : Application() {
     }
 
     private fun createNotificationChannel() {
-        // ตรวจสอบว่าเวอร์ชัน Android เป็น Oreo หรือสูงกว่า
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "important_news_channel"
             val channelName = "Important News"
-            val importance = NotificationManager.IMPORTANCE_HIGH
+            val importance = NotificationManager.IMPORTANCE_HIGH  // ใช้ IMPORTANCE_HIGH
             val channel = NotificationChannel(channelId, channelName, importance).apply {
                 description = "Channel for important news notifications"
+                enableVibration(true)  // เปิดการสั่นเพื่อเน้นการแจ้งเตือน
+                setShowBadge(true)
             }
 
-            // ลงทะเบียน Notification Channel กับระบบ
             val notificationManager: NotificationManager =
                 getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
     }
 }
+

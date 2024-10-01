@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Project News App</string>
+    <string name="app_name">CO-daily</string>
     <string name="hint_username">email or username</string>
     <string name="hint_password">password</string>
     <string name="login">Login</string>

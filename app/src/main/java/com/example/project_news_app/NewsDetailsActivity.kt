@@ -3,17 +3,15 @@ package com.example.project_news_app
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Spinner
+import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
-import com.google.gson.Gson
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,7 +19,6 @@ import retrofit2.Response
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
-import android.widget.RatingBar
 
 class NewsDetailsActivity : AppCompatActivity() {
 
@@ -86,6 +83,7 @@ class NewsDetailsActivity : AppCompatActivity() {
         saveForLaterButton.setOnClickListener {
             saveOrRemoveNewsForLater(memId, newsId)
         }
+
     }
 
     private fun submitRating(newsId: Int) {
