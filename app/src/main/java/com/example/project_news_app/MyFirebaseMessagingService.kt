@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -57,13 +58,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         )
 
         val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.images)  // เปลี่ยนไอคอนของแอป
+            .setSmallIcon(R.drawable.notifications)  // ไอคอนของคุณ
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
+            .setColor(ContextCompat.getColor(this, R.color.blue))  // กำหนดสีที่ต้องการ
+            .setColorized(true)  // เปิดให้เปลี่ยนสีได้
 
         try {
             with(NotificationManagerCompat.from(this)) {
