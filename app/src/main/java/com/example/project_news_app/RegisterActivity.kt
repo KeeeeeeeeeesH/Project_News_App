@@ -64,7 +64,6 @@ class RegisterActivity : AppCompatActivity() {
             memPassword = password,
             memEmail = email,
             memPhone = phoneNumber,
-            memStatus = 1
         )
 
         apiService.postMember(memberData).enqueue(object : Callback<MemberData> {

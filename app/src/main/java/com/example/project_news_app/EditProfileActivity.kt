@@ -1,7 +1,6 @@
 package com.example.project_news_app
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
@@ -65,8 +64,7 @@ class EditProfileActivity : AppCompatActivity() {
                     memUsername = newUsername,
                     memPassword = sharedPreferences.getString("password", "") ?: "",
                     memEmail = newEmail,
-                    memPhone = newPhone,
-                    memStatus = 1 // Assuming 1 is active status
+                    memPhone = newPhone
                 )
 
                 apiService.updateMember(memId, memberData).enqueue(object : Callback<MemberData> {

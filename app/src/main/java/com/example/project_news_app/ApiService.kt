@@ -25,8 +25,6 @@ interface ApiService {
     fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
 
     //MemberData
-    @GET("api/member/{id}")
-    fun getMemberById(@Path("id") memId: Int): Call<MemberData>
     @POST("api/member")
     fun postMember(@Body member: MemberData): Call<MemberData>
     @PUT("api/member/{id}")
@@ -41,12 +39,6 @@ interface ApiService {
     //NewsData
     @GET("api/news")
     fun getAllNews(): Call<List<NewsData>>
-    @GET("api/news/categories")
-    fun getNewsByCategories(
-        @Query("ids") ids: List<Int>,
-        @Query("page") page: Int,
-        @Query("limit") limit: Int
-    ): Call<List<NewsData>>
     @GET("api/news/category/{id}")
     fun getNewsByCategoryPaged(
         @Path("id") catId: Int,
@@ -64,8 +56,6 @@ interface ApiService {
     //News_RatingData
     @GET("api/news_rating")
     fun getNewsRating(): Call<List<News_RatingData>>
-    @GET("api/news_rating/{id}")
-    fun getNewsRatingByNewsId(@Path("id") newsId: Int): Call<News_RatingData>
     @PUT("api/news_rating/{memId}/{newsId}")
     fun putNewsRatingByMemId(
         @Path("memId") memId: Int,
@@ -80,14 +70,10 @@ interface ApiService {
     fun postTotalRead(@Body totalRead: Total_ReadData): Call<Total_ReadData>
 
     //Sub_CategoryData
-    @GET("api/sub_category")
-    fun getSubcategory(): Call<List<Sub_CategoryData>>
     @GET("api/sub_category/tag/ids")
     fun getSubcategoriesByIds(@Query("ids") ids: List<Int>): Call<List<Sub_CategoryData>>
 
     //News_Sub_CateData
-    @GET("api/news_sub_cate")
-    fun getNewsSubCate(): Call<List<News_Sub_CateData>>
     @GET("api/news_sub_cate/tag/{newsId}")
     fun getNewsSubCateByNewsId(@Path("newsId") newsId: Int): Call<List<News_Sub_CateData>>
 

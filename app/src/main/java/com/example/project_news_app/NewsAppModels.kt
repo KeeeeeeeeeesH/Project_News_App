@@ -46,7 +46,6 @@ data class OtpResult(
     val ref: String?
 )
 
-
 data class MemberData(
     @SerializedName("Mem_Id") val memId: Int,
     @SerializedName("Mem_Fname") val memFname: String,
@@ -55,7 +54,6 @@ data class MemberData(
     @SerializedName("Mem_Password") val memPassword: String,
     @SerializedName("Mem_Email") val memEmail: String,
     @SerializedName("Mem_Phone") val memPhone: String,
-    @SerializedName("Mem_Status") val memStatus: Int
 )
 
 data class CategoryData(
