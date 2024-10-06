@@ -29,38 +29,48 @@
 
         <Button
             android:id="@+id/editProfileButton"
-            android:layout_width="match_parent"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
-            android:text="แก้ไขข้อมูลส่วนตัว"
             android:layout_marginTop="20dp"
-            android:drawableLeft="@drawable/ic_edit"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:backgroundTint="#D8BFD8"
+            android:drawableLeft="@drawable/ic_manage_accounts_24px"
+            android:text="แก้ไขข้อมูลส่วนตัว"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/readLaterButton"
-            android:layout_width="match_parent"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
-            android:text="อ่านภายหลัง"
             android:layout_marginTop="20dp"
-            android:drawableLeft="@drawable/ic_star"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:backgroundTint="#D8BFD8"
+            android:drawableLeft="@drawable/ic_history_24px"
+            android:text="อ่านภายหลัง"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/NewHistoryButton"
-            android:layout_width="match_parent"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
-            android:text="ประวัติการอ่าน"
             android:layout_marginTop="20dp"
-            android:drawableLeft="@drawable/ic_star"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:backgroundTint="#D8BFD8"
+            android:drawableLeft="@drawable/ic_bookmarks_24px"
+            android:text="ประวัติการอ่าน"
+            android:textColor="@color/black" />
 
         <Button
             android:id="@+id/logout_button"
-            android:layout_width="match_parent"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
-            android:text="ออกจากระบบ"
             android:layout_marginTop="20dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:backgroundTint="#D8BFD8"
+            android:drawableLeft="@drawable/ic_logout_24px"
+            android:text="ออกจากระบบ"
+            android:textColor="@color/black" />
+
     </LinearLayout>
 
     <!-- Bottom Navigation -->

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_favorite"
-        android:icon="@drawable/ic_star"
+        android:icon="@drawable/ic_favorite_24px"
         android:title="Favorite" />
     <item
         android:id="@+id/navigation_home"
