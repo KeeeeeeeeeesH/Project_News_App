@@ -93,12 +93,12 @@ class VisitHistoryActivity : AppCompatActivity() {
 
     private fun fetchReadCounts(readHistoryWithNewsList: List<ReadHistoryWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
+        apiService.getMemberTotalReadById(memId).enqueue(object : Callback<List<Total_ReadData>> {
             override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
                 if (response.isSuccessful) {
                     val readCounts = response.body() ?: listOf()
                     readHistoryWithNewsList.forEach { news ->
-                        news.readCount = readCounts.count { it.newsId == news.newsId }
+                        news.readCount = readCounts.count { it.newsId == news.newsId && it.memId == memId }
                     }
                     fetchRatings(readHistoryWithNewsList)
                 } else {
@@ -112,28 +112,26 @@ class VisitHistoryActivity : AppCompatActivity() {
         })
     }
 
+
     private fun fetchRatings(readHistoryWithNewsList: List<ReadHistoryWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
+        apiService.getMemberRatingByMemId(memId).enqueue(object : Callback<List<News_RatingData>> {
             override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
                 if (response.isSuccessful) {
                     val ratings = response.body() ?: listOf()
                     readHistoryWithNewsList.forEach { news ->
-                        val newsRatings = ratings.filter { it.newsId == news.newsId }
-                        news.ratingScore = if (newsRatings.isNotEmpty()) {
-                            newsRatings.sumByDouble { it.ratingScore.toDouble() }.toFloat() / newsRatings.size
-                        } else {
-                            0f
-                        }
+                        // ดึงคะแนนเฉพาะของสมาชิกคนปัจจุบัน
+                        val memberRating = ratings.find { it.newsId == news.newsId }
+                        news.ratingScore = memberRating?.ratingScore ?: 0f
                     }
-                    fetchCoverImages(readHistoryWithNewsList)
+                    fetchCoverImages(readHistoryWithNewsList)  // เรียก fetchCoverImages หลังจากได้คะแนนแล้ว
                 } else {
-                    Toast.makeText(this@VisitHistoryActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@VisitHistoryActivity, "ไม่สามารถดึงข้อมูลคะแนนได้", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                Toast.makeText(this@VisitHistoryActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@VisitHistoryActivity, "เกิดข้อผิดพลาดในการดึงคะแนน: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

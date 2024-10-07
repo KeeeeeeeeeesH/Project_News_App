@@ -84,6 +84,7 @@ data class NewsData(
     @SerializedName("Date_Added") val dateAdded: Date,
     @SerializedName("Cat_Id") val catId: Int,
     @SerializedName("Major_Id") val majorId: Int,
+    @SerializedName("Adm_Fname") val admName: String?,
     var readCount: Int = 0,
     var ratingScore: Float = 0f,
     var coverImageUrl: String? = null
@@ -141,5 +142,6 @@ data class ReadHistoryWithNewsData(
 
 data class Total_ReadData(
     @SerializedName("Count_Id") val countId: Int,
-    @SerializedName("News_Id") val newsId: Int
+    @SerializedName("News_Id") val newsId: Int,
+    @SerializedName("Mem_Id") val memId: Int
 )

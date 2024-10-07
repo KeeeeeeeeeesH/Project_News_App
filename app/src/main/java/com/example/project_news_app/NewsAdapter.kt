@@ -14,7 +14,6 @@ import com.example.project_news_app.NewsData
 import com.example.project_news_app.NewsDetailsActivity
 import com.example.project_news_app.R
 import com.example.project_news_app.ReadHistoryWithNewsData
-import com.example.project_news_app.ReadLaterWithNewsData
 import com.example.project_news_app.VisitHistoryActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -50,16 +49,17 @@ class NewsAdapter(
         when (newsType) {
             NewsType.VISIT_HISTORY -> {
                 if (item is ReadHistoryWithNewsData) {
-                    // ระบบประวัติการอ่าน
                     holder.newsName.text = item.newsName
+                    holder.itemView.findViewById<TextView>(R.id.admin_label).visibility = View.GONE
+                    holder.itemView.findViewById<TextView>(R.id.read_date_label).visibility = View.VISIBLE
 
                     // Format date
                     val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                     val formattedDate = targetFormat.format(item.readDate)
 
                     holder.newsDate.text = formattedDate
-                    holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"
-                    holder.newsRating.text = "★ %.2f".format(item.ratingScore)
+                    holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"  // เปลี่ยนเป็นของสมาชิก
+                    holder.newsRating.text = "คะแนนที่ให้ ★ %.2f".format(item.ratingScore)  // เปลี่ยนเป็นคะแนนของสมาชิก
 
                     // Load cover image if available
                     if (!item.coverImage.isNullOrEmpty()) {
@@ -98,39 +98,9 @@ class NewsAdapter(
                     }
                 }
             }
-            NewsType.READ_LATER -> {
-                if (item is ReadLaterWithNewsData) {
-                    // ระบบข่าวอ่านภายหลัง
-                    holder.newsName.text = item.newsName
-
-                    // Format date
-                    val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                    val formattedDate = targetFormat.format(item.dateAdded)
-
-                    holder.newsDate.text = formattedDate
-                    holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"
-                    holder.newsRating.text = "★ %.2f".format(item.ratingScore)
-
-                    // Load cover image if available
-                    if (!item.coverImage.isNullOrEmpty()) {
-                        Glide.with(holder.itemView.context)
-                            .load(item.coverImage)
-                            .into(holder.newsPicture)
-                    } else {
-                        holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon)
-                    }
-
-                    // Set click listener to open NewsDetailsActivity
-                    holder.itemView.setOnClickListener {
-                        val intent = Intent(holder.itemView.context, NewsDetailsActivity::class.java)
-                        intent.putExtra("news_id", item.newsId)
-                        holder.itemView.context.startActivity(intent)
-                    }
-                }
-            }
-            NewsType.FAVORITE, NewsType.GENERAL -> {
+            NewsType.FAVORITE, NewsType.GENERAL, NewsType.READ_LATER -> {
                 if (item is NewsData) {
-                    // ระบบข่าวทั่วไป
+                    // ระบบข่าวอื่นๆ
                     holder.newsName.text = item.newsName
 
                     // Format date
@@ -141,7 +111,7 @@ class NewsAdapter(
 
                     holder.newsDate.text = formattedDate
                     holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"
-                    holder.newsRating.text = "★ %.2f".format(item.ratingScore)
+                    holder.newsRating.text = "คะแนน ★ %.2f".format(item.ratingScore)
 
                     // Load cover image if available
                     if (!item.coverImageUrl.isNullOrEmpty()) {

@@ -137,24 +137,32 @@ class NewsDetailsActivity : AppCompatActivity() {
     }
 
     private fun increaseReadCount(newsId: Int) {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        val totalRead = Total_ReadData(0, newsId) // Count_Id เป็น 0 เพราะจะให้ฐานข้อมูลเพิ่มค่าอัตโนมัติ
+        val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        val memId = sharedPreferences.getInt("memId", -1)
 
-        apiService.postTotalRead(totalRead).enqueue(object : Callback<Total_ReadData> {
-            override fun onResponse(call: Call<Total_ReadData>, response: Response<Total_ReadData>) {
-                if (response.isSuccessful) {
-                    Log.d("NewsDetailsActivity", "Read count increased successfully")
-                    fetchReadCount(newsId) // อัปเดตจำนวนการอ่านใน UI
-                } else {
-                    Log.e("NewsDetailsActivity", "Failed to increase read count")
+        if (memId != -1) {
+            val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+            val totalRead = Total_ReadData(0, newsId, memId)
+
+            apiService.postTotalRead(totalRead).enqueue(object : Callback<Total_ReadData> {
+                override fun onResponse(call: Call<Total_ReadData>, response: Response<Total_ReadData>) {
+                    if (response.isSuccessful) {
+                        Log.d("NewsDetailsActivity", "Read count increased successfully")
+                        fetchReadCount(newsId) // อัปเดตจำนวนการอ่านใน UI
+                    } else {
+                        Log.e("NewsDetailsActivity", "Failed to increase read count")
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Total_ReadData>, t: Throwable) {
-                Log.e("NewsDetailsActivity", "Error: ${t.message}")
-            }
-        })
+                override fun onFailure(call: Call<Total_ReadData>, t: Throwable) {
+                    Log.e("NewsDetailsActivity", "Error: ${t.message}")
+                }
+            })
+        } else {
+            Log.e("NewsDetailsActivity", "Failed to retrieve member ID")
+        }
     }
+
 
     // Fetch read count from API
     private fun fetchReadCount(newsId: Int) {

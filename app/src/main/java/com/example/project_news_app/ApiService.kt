@@ -102,5 +102,17 @@ interface ApiService {
     fun addReadHistory(@Body readHistory: Read_HistoryData): Call<Void>
     @DELETE("api/read_history/{memId}/{newsId}")
     fun deleteReadHistory(@Path("memId") memId: Int, @Path("newsId") newsId: Int): Call<Void>
+
+    // endpoint สำหรับดึงจำนวนการอ่านเฉพาะของสมาชิกคนเดียว
+    @GET("api/total_read/member/{memId}")
+    fun getMemberTotalReadById(
+        @Path("memId") memId: Int
+    ): Call<List<Total_ReadData>>
+
+    // endpoint สำหรับดึงคะแนนของข่าวเฉพาะสมาชิกคนเดียว
+    @GET("api/news_rating/member/{memId}")
+    fun getMemberRatingByMemId(
+        @Path("memId") memId: Int
+    ): Call<List<News_RatingData>>
 }
 
