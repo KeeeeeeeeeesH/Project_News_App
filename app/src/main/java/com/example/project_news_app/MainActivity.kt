@@ -26,7 +26,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -47,7 +46,12 @@ class MainActivity : AppCompatActivity() {
     private var currentCategoryId: Int = 0 // Default ไปที่ "แนะนำ"
     private var currentPage: Int = 0 // index ของหน้าข่าวสำหรับการโหลดข่าวเพิ่ม
     private var allNewsList: List<NewsData> = listOf() // All news list
-    private var memId: Int = -1
+
+    private var isSearching = false // ตัวแปรสถานะการค้นหา
+    private var currentSearchType: String? = null
+    private var currentSearchQuery: String? = null
+    private var currentStartDateStr: String? = null
+    private var currentEndDateStr: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // swipe refresh
+        // ตั้งค่า swipe refresh
         swipeRefreshLayout.setOnRefreshListener {
             loadNewsByCategory(currentCategoryId)
         }
@@ -154,10 +158,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.e("FCM", "Failed to retrieve memId for subscribing to user topic")
         }
+
     }
 
     private fun onToggleCategoriesClick() {
-        // Implementation of toggle categories
     }
 
     private fun loadCategories() {
@@ -227,82 +231,10 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun fetchReadCounts(newsList: List<NewsData>) {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-
-        apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
-            override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
-                if (response.isSuccessful) {
-                    val readCounts = response.body() ?: listOf()
-                    newsList.forEach { news ->
-                        news.readCount = readCounts.count { it.newsId == news.newsId }
-                    }
-                    fetchRatings(newsList)
-                } else {
-                    Toast.makeText(this@MainActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun fetchRatings(newsList: List<NewsData>) {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-
-        apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
-            override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
-                if (response.isSuccessful) {
-                    val ratings = response.body() ?: listOf()
-                    newsList.forEach { news ->
-                        val newsRatings = ratings.filter { it.newsId == news.newsId }
-                        news.ratingScore = if (newsRatings.isNotEmpty()) {
-                            newsRatings.sumByDouble { it.ratingScore.toDouble() }
-                                .toFloat() / newsRatings.size
-                        } else {
-                            0f
-                        }
-                    }
-                    fetchCoverImages(newsList)
-                } else {
-                    Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
-    }
-
-    private fun fetchCoverImages(newsList: List<NewsData>) {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-
-        newsList.forEach { news ->
-            apiService.getCoverImage(news.newsId).enqueue(object : Callback<List<PictureData>> {
-                override fun onResponse(call: Call<List<PictureData>>, response: Response<List<PictureData>>) {
-                    if (response.isSuccessful) {
-                        val pictures = response.body() ?: listOf()
-                        val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
-                        news.coverImageUrl = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
-                        newsAdapter.notifyDataSetChanged()
-                    } else {
-                        Toast.makeText(this@MainActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
-                override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                    Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                }
-            })
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == SEARCH_REQUEST_CODE && resultCode == RESULT_OK) {
+
             val searchType = data?.getStringExtra("SEARCH_TYPE")
             when (searchType) {
                 "NAME" -> {
@@ -319,10 +251,6 @@ class MainActivity : AppCompatActivity() {
                     if (startDateStr != null && endDateStr != null) {
                         searchNewsByDateRange(startDateStr, endDateStr)
                     }
-                }
-                "PERIOD" -> {
-                    val period = data.getStringExtra("SEARCH_QUERY") ?: return
-                    searchNewsByPeriod(period)
                 }
             }
 
@@ -367,59 +295,6 @@ class MainActivity : AppCompatActivity() {
         newsAdapter.setNews(filteredNewsList)
     }
 
-    private fun searchNewsByPeriod(period: String) {
-        val calendar = Calendar.getInstance()
-        val currentDate = Date()
-
-        val filteredNewsList = when (period) {
-            "CURRENT_WEEK" -> {
-                calendar.time = currentDate
-                calendar.add(Calendar.DAY_OF_YEAR, -7)
-                val targetDate = calendar.time
-                allNewsList.filter {
-                    it.dateAdded != null && it.dateAdded.after(targetDate)
-                }
-            }
-            "LAST_WEEK" -> {
-                calendar.time = currentDate
-                calendar.add(Calendar.DAY_OF_YEAR, -7)
-                val endDate = calendar.time
-                calendar.add(Calendar.DAY_OF_YEAR, -7)
-                val startDate = calendar.time
-                allNewsList.filter {
-                    it.dateAdded != null && it.dateAdded.after(startDate) && it.dateAdded.before(endDate)
-                }
-            }
-            "LAST_MONTH" -> {
-                calendar.time = currentDate
-                calendar.add(Calendar.DAY_OF_YEAR, -30)
-                val targetDate = calendar.time
-                allNewsList.filter {
-                    it.dateAdded != null && it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
-                }
-            }
-            "LAST_SIX_MONTHS" -> {
-                calendar.time = currentDate
-                calendar.add(Calendar.DAY_OF_YEAR, -180)
-                val targetDate = calendar.time
-                allNewsList.filter {
-                    it.dateAdded != null && it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
-                }
-            }
-            "LAST_YEAR" -> {
-                calendar.time = currentDate
-                calendar.add(Calendar.DAY_OF_YEAR, -365)
-                val targetDate = calendar.time
-                allNewsList.filter {
-                    it.dateAdded != null && it.dateAdded.after(targetDate) && it.dateAdded.before(currentDate)
-                }
-            }
-            else -> listOf()
-        }.distinctBy { it.newsId } // ป้องกันการแสดงข่าวซ้ำ
-
-        newsAdapter.setNews(filteredNewsList)
-    }
-
     private fun isDateMatch(date: Date, query: String): Boolean {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dateString = dateFormat.format(date)
@@ -438,11 +313,76 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        private const val SEARCH_REQUEST_CODE = 1
+    private fun fetchReadCounts(newsList: List<NewsData>) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+
+        apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
+            override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
+                if (response.isSuccessful) {
+                    val readCounts = response.body() ?: listOf()
+                    newsList.forEach { news ->
+                        news.readCount = readCounts.count { it.newsId == news.newsId }
+                    }
+                    fetchRatings(newsList)
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
+    private fun fetchRatings(newsList: List<NewsData>) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
+        apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
+            override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
+                if (response.isSuccessful) {
+                    val ratings = response.body() ?: listOf()
+                    newsList.forEach { news ->
+                        val newsRatings = ratings.filter { it.newsId == news.newsId }
+                        news.ratingScore = if (newsRatings.isNotEmpty()) {
+                            newsRatings.sumByDouble { it.ratingScore.toDouble() }
+                                .toFloat() / newsRatings.size
+                        } else {
+                            0f
+                        }
+                    }
+                    fetchCoverImages(newsList)
+                } else {
+                    Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                }
+            }
 
+            override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+    private fun fetchCoverImages(newsList: List<NewsData>) {
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+
+        newsList.forEach { news ->
+            apiService.getCoverImage(news.newsId).enqueue(object : Callback<List<PictureData>> {
+                override fun onResponse(call: Call<List<PictureData>>, response: Response<List<PictureData>>) {
+                    if (response.isSuccessful) {
+                        val pictures = response.body() ?: listOf()
+                        val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
+                        news.coverImageUrl = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
+                        newsAdapter.notifyDataSetChanged()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+    }
     private fun showNoInternetError() {
         val dialog = AlertDialog.Builder(this)
             .setTitle("ไม่มีการเชื่อมต่ออินเทอร์เน็ต")
@@ -450,6 +390,9 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("ตกลง", null)
             .create()
         dialog.show()
+    }
+    companion object {
+        private const val SEARCH_REQUEST_CODE = 1
     }
 
 }

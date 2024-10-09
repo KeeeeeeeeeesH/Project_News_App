@@ -84,7 +84,6 @@ data class NewsData(
     @SerializedName("Date_Added") val dateAdded: Date,
     @SerializedName("Cat_Id") val catId: Int,
     @SerializedName("Major_Id") val majorId: Int,
-    @SerializedName("Adm_Fname") val admName: String?,
     var readCount: Int = 0,
     var ratingScore: Float = 0f,
     var coverImageUrl: String? = null
