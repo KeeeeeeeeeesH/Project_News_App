@@ -7,9 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -25,9 +23,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,19 +34,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var categoryAdapter: CategoryAdapter
-    private lateinit var foundNewsLabel: TextView
-    private lateinit var backButton: ImageButton
-    private lateinit var foundNewsContainer: View
+
 
     private var currentCategoryId: Int = 0 // Default ไปที่ "แนะนำ"
     private var currentPage: Int = 0 // index ของหน้าข่าวสำหรับการโหลดข่าวเพิ่ม
     private var allNewsList: List<NewsData> = listOf() // All news list
-
-    private var isSearching = false // ตัวแปรสถานะการค้นหา
-    private var currentSearchType: String? = null
-    private var currentSearchQuery: String? = null
-    private var currentStartDateStr: String? = null
-    private var currentEndDateStr: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,9 +50,7 @@ class MainActivity : AppCompatActivity() {
         categoriesRecyclerView = findViewById(R.id.categories_recycler_view)
         newsRecyclerView = findViewById(R.id.news_recycler_view)
         bottomNavigation = findViewById(R.id.bottom_navigation)
-        foundNewsLabel = findViewById(R.id.found_news_label)
-        backButton = findViewById(R.id.back_button)
-        foundNewsContainer = findViewById(R.id.found_news_container)
+
 
         categoriesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         newsRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -108,14 +93,6 @@ class MainActivity : AppCompatActivity() {
             onToggleCategoriesClick()
         }
 
-        searchButton.setOnClickListener {
-            startActivityForResult(Intent(this, SearchNewsActivity::class.java), SEARCH_REQUEST_CODE)
-        }
-
-        backButton.setOnClickListener {
-            onBackPressed()
-        }
-
         newsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!recyclerView.canScrollVertically(1)) {
@@ -127,6 +104,11 @@ class MainActivity : AppCompatActivity() {
         // ตั้งค่า swipe refresh
         swipeRefreshLayout.setOnRefreshListener {
             loadNewsByCategory(currentCategoryId)
+        }
+
+        searchButton.setOnClickListener {
+            val intent = Intent(this@MainActivity, SearchNewsActivity::class.java)
+            startActivityForResult(intent, SEARCH_REQUEST_CODE)
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -193,6 +175,7 @@ class MainActivity : AppCompatActivity() {
         currentPage = 0
         allNewsList = listOf()
         loadMoreNews()
+        swipeRefreshLayout.isEnabled = true
     }
 
     private fun loadMoreNews() {
@@ -229,88 +212,6 @@ class MainActivity : AppCompatActivity() {
                 swipeRefreshLayout.isRefreshing = false // Stop the refreshing indicator
             }
         })
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == SEARCH_REQUEST_CODE && resultCode == RESULT_OK) {
-
-            val searchType = data?.getStringExtra("SEARCH_TYPE")
-            when (searchType) {
-                "NAME" -> {
-                    val query = data.getStringExtra("SEARCH_QUERY") ?: return
-                    searchNews(query)
-                }
-                "DATE" -> {
-                    val query = data.getStringExtra("SEARCH_QUERY") ?: return
-                    searchNewsByDate(query)
-                }
-                "DATE_RANGE" -> {
-                    val startDateStr = data?.getStringExtra("START_DATE")
-                    val endDateStr = data?.getStringExtra("END_DATE")
-                    if (startDateStr != null && endDateStr != null) {
-                        searchNewsByDateRange(startDateStr, endDateStr)
-                    }
-                }
-            }
-
-            findViewById<View>(R.id.categories_container).visibility = View.GONE
-            foundNewsContainer.visibility = View.VISIBLE
-
-            // เอาปุ่มค้นหาออก
-            findViewById<View>(R.id.search_bar_container).visibility = View.GONE
-        }
-    }
-
-    private fun clearSearchResults() {
-        newsAdapter.setNews(listOf()) // ตั้งค่า Adapter ให้แสดงรายการว่างเพื่อเคลียร์ผลการค้นหา
-    }
-
-    private fun searchNewsByDateRange(startDateStr: String, endDateStr: String) {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val startDate = dateFormat.parse(startDateStr)
-        val endDate = dateFormat.parse(endDateStr)
-
-        val filteredNewsList = allNewsList.filter {
-            it.dateAdded != null && it.dateAdded.after(startDate) && it.dateAdded.before(endDate)
-        }
-        newsAdapter.setNews(filteredNewsList)
-    }
-
-    private fun searchNews(query: String) {
-        val filteredNewsList = allNewsList.filter {
-            it.newsName.contains(query, ignoreCase = true)
-        }.distinctBy { it.newsId } // ป้องกันการแสดงข่าวซ้ำ
-
-        newsAdapter.setNews(filteredNewsList)
-    }
-
-    private fun searchNewsByDate(query: String) {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val date = dateFormat.parse(query)
-        val filteredNewsList = allNewsList.filter {
-            it.dateAdded != null && isDateMatch(it.dateAdded, query)
-        }.distinctBy { it.newsId } // ป้องกันการแสดงข่าวซ้ำ
-
-        newsAdapter.setNews(filteredNewsList)
-    }
-
-    private fun isDateMatch(date: Date, query: String): Boolean {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val dateString = dateFormat.format(date)
-        return dateString == query
-    }
-
-    override fun onBackPressed() {
-        if (foundNewsContainer.visibility == View.VISIBLE) {
-            clearSearchResults()
-            // ถ้าอยู่ในหน้าข่าวที่พบ ให้กลับไปที่หน้าค้นหา
-            val intent = Intent(this, SearchNewsActivity::class.java)
-            startActivity(intent)
-
-        } else {
-            super.onBackPressed()
-        }
     }
 
     private fun fetchReadCounts(newsList: List<NewsData>) {
@@ -394,6 +295,5 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val SEARCH_REQUEST_CODE = 1
     }
-
 }
 

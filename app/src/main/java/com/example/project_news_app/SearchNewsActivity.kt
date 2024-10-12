@@ -3,11 +3,15 @@ package com.example.project_news_app
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class SearchNewsActivity : AppCompatActivity() {
 
@@ -129,43 +133,44 @@ class SearchNewsActivity : AppCompatActivity() {
     }
 
     private fun searchNewsByName(query: String) {
-        val intent = Intent().apply {
+        val intent = Intent(this, SearchResultActivity::class.java).apply {
             putExtra("SEARCH_QUERY", query)
             putExtra("SEARCH_TYPE", "NAME")
         }
-        setResult(RESULT_OK, intent)
-        finish()
+        startActivity(intent)
     }
 
     private fun searchNewsByDate(date: Date) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dateString = dateFormat.format(date)
-        val intent = Intent().apply {
+        val intent = Intent(this, SearchResultActivity::class.java).apply {
             putExtra("SEARCH_QUERY", dateString)
             putExtra("SEARCH_TYPE", "DATE")
         }
-        setResult(RESULT_OK, intent)
-        finish()
+        startActivity(intent)
     }
 
     private fun searchNewsByDateRange(startDate: Date, endDate: Date) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val startDateString = dateFormat.format(startDate)
         val endDateString = dateFormat.format(endDate)
-        val intent = Intent().apply {
+        val intent = Intent(this, SearchResultActivity::class.java).apply {
             putExtra("START_DATE", startDateString)
             putExtra("END_DATE", endDateString)
             putExtra("SEARCH_TYPE", "DATE_RANGE")
         }
-        setResult(RESULT_OK, intent)
-        finish()
+        startActivity(intent)
     }
 
     override fun onBackPressed() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        startActivity(intent)
-        finish()
+        // เรียก super ก่อนการจัดการ Intent ใหม่
         super.onBackPressed()
+        // ใช้ Intent ที่ไม่ซ้ำกันเพื่อลบ stack เดิม
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish() // จบการทำงานของ SearchNewsActivity
     }
+
+
 }
