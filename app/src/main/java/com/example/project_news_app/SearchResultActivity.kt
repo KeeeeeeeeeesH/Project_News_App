@@ -117,7 +117,7 @@ class SearchResultActivity : AppCompatActivity() {
             it.dateAdded != null && it.dateAdded.after(startDate) && it.dateAdded.before(adjustedEndDate)
         }
 
-        newsAdapter.setNews(filteredNewsList)
+        fetchReadCounts(filteredNewsList)
     }
 
 
