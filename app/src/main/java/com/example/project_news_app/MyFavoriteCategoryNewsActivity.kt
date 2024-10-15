@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.project_news_app.adapters.NewsAdapter
@@ -14,7 +15,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import androidx.appcompat.widget.Toolbar
 
 class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
 
@@ -219,7 +219,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val pictures = response.body() ?: listOf()
                         val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
-                        news.coverImageUrl = coverImage?.let { "${RetrofitClient.getClient(this@MyFavoriteCategoryNewsActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
+                        news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@MyFavoriteCategoryNewsActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
                         newsAdapter.notifyDataSetChanged()
                     } else {
                         Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()

@@ -182,7 +182,7 @@ class SearchResultActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val pictures = response.body() ?: listOf()
                         val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
-                        news.coverImageUrl = coverImage?.let { "${RetrofitClient.getClient(this@SearchResultActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
+                        news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@SearchResultActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
                         newsAdapter.notifyDataSetChanged()
                     } else {
                         Toast.makeText(this@SearchResultActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()

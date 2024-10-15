@@ -14,6 +14,7 @@ import com.example.project_news_app.NewsData
 import com.example.project_news_app.NewsDetailsActivity
 import com.example.project_news_app.R
 import com.example.project_news_app.ReadHistoryWithNewsData
+import com.example.project_news_app.ReadLaterWithNewsData
 import com.example.project_news_app.VisitHistoryActivity
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -47,6 +48,38 @@ class NewsAdapter(
         val item = newsList[position]
 
         when (newsType) {
+            NewsType.FAVORITE, NewsType.GENERAL -> {
+                if (item is NewsData) {
+                    // ระบบข่าวอื่นๆ
+                    holder.newsName.text = item.newsName
+
+                    // Format date
+                    val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
+                    val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                    val date = originalFormat.parse(item.dateAdded.toString())
+                    val formattedDate = targetFormat.format(date)
+
+                    holder.newsDate.text = formattedDate
+                    holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"
+                    holder.newsRating.text = "คะแนน ★ %.2f".format(item.ratingScore)
+
+                    // Load cover image if available
+                    if (!item.coverImage.isNullOrEmpty()) {
+                        Glide.with(holder.itemView.context)
+                            .load(item.coverImage)
+                            .into(holder.newsPicture)
+                    } else {
+                        holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon)
+                    }
+
+                    // Set click listener to open NewsDetailsActivity
+                    holder.itemView.setOnClickListener {
+                        val intent = Intent(holder.itemView.context, NewsDetailsActivity::class.java)
+                        intent.putExtra("news_id", item.newsId)
+                        holder.itemView.context.startActivity(intent)
+                    }
+                }
+            }
             NewsType.VISIT_HISTORY -> {
                 if (item is ReadHistoryWithNewsData) {
                     holder.newsName.text = item.newsName
@@ -98,9 +131,9 @@ class NewsAdapter(
                     }
                 }
             }
-            NewsType.FAVORITE, NewsType.GENERAL, NewsType.READ_LATER -> {
-                if (item is NewsData) {
-                    // ระบบข่าวอื่นๆ
+            NewsType.READ_LATER -> {
+                if (item is ReadLaterWithNewsData) {
+                    // ระบบข่าวอ่านภายหลัง
                     holder.newsName.text = item.newsName
 
                     // Format date
@@ -114,9 +147,9 @@ class NewsAdapter(
                     holder.newsRating.text = "คะแนน ★ %.2f".format(item.ratingScore)
 
                     // Load cover image if available
-                    if (!item.coverImageUrl.isNullOrEmpty()) {
+                    if (!item.coverImage.isNullOrEmpty()) {
                         Glide.with(holder.itemView.context)
-                            .load(item.coverImageUrl)
+                            .load(item.coverImage)
                             .into(holder.newsPicture)
                     } else {
                         holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon)

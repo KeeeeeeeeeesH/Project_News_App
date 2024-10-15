@@ -30,6 +30,7 @@ class ReadLaterActivity : AppCompatActivity() {
         readLaterRecyclerView.layoutManager = LinearLayoutManager(this)
 
         newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.READ_LATER)
+
         readLaterRecyclerView.adapter = newsAdapter
 
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)

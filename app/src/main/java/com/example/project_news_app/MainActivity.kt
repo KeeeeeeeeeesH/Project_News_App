@@ -271,7 +271,7 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val pictures = response.body() ?: listOf()
                         val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
-                        news.coverImageUrl = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
+                        news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
                         newsAdapter.notifyDataSetChanged()
                     } else {
                         Toast.makeText(this@MainActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()

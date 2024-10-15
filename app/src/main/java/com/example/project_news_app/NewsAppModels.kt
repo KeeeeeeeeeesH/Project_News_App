@@ -86,7 +86,7 @@ data class NewsData(
     @SerializedName("Major_Id") val majorId: Int,
     var readCount: Int = 0,
     var ratingScore: Float = 0f,
-    var coverImageUrl: String? = null
+    var coverImage: String? = null
 )
 
 data class PictureData(

@@ -74,7 +74,7 @@ class VisitHistoryActivity : AppCompatActivity() {
                                 readDate = readHistory.readDate,
                                 newsName = it.newsName,
                                 ratingScore = it.ratingScore,
-                                coverImage = it.coverImageUrl ?: "",
+                                coverImage = it.coverImage ?: "",
                                 readCount = it.readCount
                             )
                         }
