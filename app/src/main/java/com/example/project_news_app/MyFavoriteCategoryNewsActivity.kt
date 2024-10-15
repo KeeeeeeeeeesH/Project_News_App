@@ -77,15 +77,16 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         memId = sharedPreferences.getInt("memId", -1)
 
         if (memId != -1) {
-            fetchAllCategories() // ดึงหมวดหมู่ทั้งหมดก่อน
-            fetchFavoriteNews()
-            fetchSelectedCategories(memId)
+            fetchAllCategories { // เมื่อหมวดหมู่โหลดเสร็จแล้ว
+                fetchFavoriteNews() // ดึงข่าวในหมวดหมู่โปรด
+                fetchSelectedCategories(memId) // ดึงหมวดหมู่ที่เลือกแล้ว
+            }
         } else {
             Toast.makeText(this, "ไม่พบข้อมูลสมาชิก", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun fetchAllCategories() {
+    private fun fetchAllCategories(onComplete: () -> Unit) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
@@ -94,6 +95,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                     categories?.forEach { category ->
                         categoryMap[category.catId] = category.catName
                     }
+                    onComplete()  // เรียก callback หลังจากที่ข้อมูลหมวดหมู่ถูกโหลด
                 } else {
                     Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดข้อมูลหมวดหมู่ได้", Toast.LENGTH_SHORT).show()
                 }
@@ -105,39 +107,33 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         })
     }
 
+
     private fun fetchFavoriteNews() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-        apiService.getNewsByFavoriteCategory(memId).enqueue(object : Callback<List<NewsData>> {
-            override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
-                if (response.isSuccessful) {
-                    val newsList = response.body() ?: emptyList()
-                    if (newsList.isEmpty()) {
-                        Toast.makeText(
-                            this@MyFavoriteCategoryNewsActivity,
-                            "ไม่พบข่าวในหมวดหมู่โปรด",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        fetchAdditionalNewsData(newsList)
-                    }
-                } else {
-                    Toast.makeText(
-                        this@MyFavoriteCategoryNewsActivity,
-                        "ไม่สามารถดึงข้อมูลข่าวในหมวดหมู่โปรดได้",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
 
-            override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
-                Toast.makeText(
-                    this@MyFavoriteCategoryNewsActivity,
-                    "เกิดข้อผิดพลาดในการดึงข้อมูลข่าวในหมวดหมู่โปรด: ${t.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        })
+        // ดึงข้อมูลหมวดหมู่ทั้งหมดก่อนเพื่อลดปัญหา Unknown Category
+        fetchAllCategories {
+            apiService.getNewsByFavoriteCategory(memId).enqueue(object : Callback<List<NewsData>> {
+                override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
+                    if (response.isSuccessful) {
+                        val newsList = response.body() ?: emptyList()
+                        if (newsList.isEmpty()) {
+                            Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่พบข่าวในหมวดหมู่โปรด", Toast.LENGTH_SHORT).show()
+                        } else {
+                            fetchAdditionalNewsData(newsList)
+                        }
+                    } else {
+                        Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถดึงข้อมูลข่าวในหมวดหมู่โปรดได้", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
+                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "เกิดข้อผิดพลาดในการดึงข้อมูลข่าวในหมวดหมู่โปรด: ${t.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
     }
+
 
     private fun fetchSelectedCategories(memId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
