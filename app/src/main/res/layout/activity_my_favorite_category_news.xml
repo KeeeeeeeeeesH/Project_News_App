@@ -57,6 +57,14 @@
         android:src="@drawable/ic_edit"
         android:contentDescription="Edit Favorite Categories"/>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" /> <!-- ซ่อน ProgressBar โดยค่าเริ่มต้น -->
+
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

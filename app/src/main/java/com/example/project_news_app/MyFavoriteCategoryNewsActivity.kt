@@ -3,6 +3,8 @@ package com.example.project_news_app
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +24,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
     private lateinit var newsAdapter: NewsAdapter
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var selectedCategoriesTextView: TextView
+    private lateinit var progressBar: ProgressBar
     private var memId: Int = -1
     private val categoryMap = mutableMapOf<Int, String>()  // เก็บ catId และ catName
 
@@ -40,6 +43,9 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         selectedCategoriesTextView = findViewById(R.id.selected_categories_text_view)
         favoriteNewsRecyclerView = findViewById(R.id.recycler_view)
         bottomNavigation = findViewById(R.id.bottom_navigation)
+        progressBar = findViewById(R.id.progress_bar)
+
+        progressBar.visibility = View.VISIBLE
 
         favoriteNewsRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -80,9 +86,11 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             fetchAllCategories { // เมื่อหมวดหมู่โหลดเสร็จแล้ว
                 fetchFavoriteNews() // ดึงข่าวในหมวดหมู่โปรด
                 fetchSelectedCategories(memId) // ดึงหมวดหมู่ที่เลือกแล้ว
+                progressBar.visibility = View.GONE
             }
         } else {
             Toast.makeText(this, "ไม่พบข้อมูลสมาชิก", Toast.LENGTH_SHORT).show()
+            progressBar.visibility = View.GONE
         }
     }
 
@@ -109,9 +117,9 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
 
 
     private fun fetchFavoriteNews() {
-        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        progressBar.visibility = View.VISIBLE
 
-        // ดึงข้อมูลหมวดหมู่ทั้งหมดก่อนเพื่อลดปัญหา Unknown Category
+        val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         fetchAllCategories {
             apiService.getNewsByFavoriteCategory(memId).enqueue(object : Callback<List<NewsData>> {
                 override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
@@ -125,10 +133,12 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                     } else {
                         Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถดึงข้อมูลข่าวในหมวดหมู่โปรดได้", Toast.LENGTH_SHORT).show()
                     }
+                    progressBar.visibility = View.GONE
                 }
 
                 override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
                     Toast.makeText(this@MyFavoriteCategoryNewsActivity, "เกิดข้อผิดพลาดในการดึงข้อมูลข่าวในหมวดหมู่โปรด: ${t.message}", Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
                 }
             })
         }
