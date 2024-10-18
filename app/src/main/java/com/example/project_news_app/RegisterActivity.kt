@@ -45,9 +45,9 @@ class RegisterActivity : AppCompatActivity() {
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
             if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "กรุณากรอกข้อมูลให้ครบทุกช่อง", Toast.LENGTH_SHORT).show()
             } else if (password != confirmPassword) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "รหัสผ่านไม่ตรงกัน", Toast.LENGTH_SHORT).show()
             } else {
                 registerMember(firstName, lastName, phoneNumber, email, username, password)
             }
@@ -76,14 +76,14 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<MemberData>, t: Throwable) {
-                Toast.makeText(this@RegisterActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RegisterActivity, "มีข้อผิดพลาดเกิดขึ้น: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun showSuccessDialog() {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage("Registered Successful")
+        builder.setMessage("สมัครสมาชิกสำเร็จ")
             .setPositiveButton("OK") { dialog, id ->
                 val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
                 startActivity(intent)
@@ -93,8 +93,8 @@ class RegisterActivity : AppCompatActivity() {
     }
     private fun handleRegistrationError(response: Response<MemberData>) {
         val errorMessage = when (response.code()) {
-            409 -> "Username, email, or phone number already exists in the system"
-            else -> "Registration failed: ${response.message()}"
+            409 -> "ชื่อผู้ใช้งาน, อีเมล์, หรือหมายเลขโทรศัพท์นี้ มีอยู่ในระบบแล้ว"
+            else -> "สมัครสมาชิกไม่สำเร็จ: ${response.message()}"
         }
         Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
     }

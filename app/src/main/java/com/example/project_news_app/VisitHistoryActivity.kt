@@ -79,7 +79,7 @@ class VisitHistoryActivity : AppCompatActivity() {
                             )
                         }
                     }
-                    fetchReadCounts(readHistoryWithNewsList) // เรียก fetchReadCounts ต่อ
+                    fetchReadCounts(readHistoryWithNewsList)
                 } else {
                     Toast.makeText(this@VisitHistoryActivity, "ไม่สามารถดึงข้อมูลข่าวได้", Toast.LENGTH_SHORT).show()
                 }
@@ -102,12 +102,12 @@ class VisitHistoryActivity : AppCompatActivity() {
                     }
                     fetchRatings(readHistoryWithNewsList)
                 } else {
-                    Toast.makeText(this@VisitHistoryActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@VisitHistoryActivity, "โหลดยอดการอ่านข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                Toast.makeText(this@VisitHistoryActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@VisitHistoryActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -147,12 +147,12 @@ class VisitHistoryActivity : AppCompatActivity() {
                         news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@VisitHistoryActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
                         newsAdapter.notifyDataSetChanged()
                     } else {
-                        Toast.makeText(this@VisitHistoryActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@VisitHistoryActivity, "ไม่สามารถดึงรูปภาพข่าวได้", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                    Toast.makeText(this@VisitHistoryActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@VisitHistoryActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }

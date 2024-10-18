@@ -42,14 +42,14 @@ class NewsDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news_detail)
 
-        // Set up toolbar with back button
+        // ตั้งค่า toolbar และปุ่มย้อนกลับ
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, android.R.color.black))
         toolbar.setNavigationOnClickListener { onBackPressed() }
 
-        // Initialize UI elements
+        //Initialize UI
         newsTitle = findViewById(R.id.news_name)
         newsCategory = findViewById(R.id.cat_name)
         newsMajorLevel = findViewById(R.id.major_level)
@@ -63,6 +63,7 @@ class NewsDetailsActivity : AppCompatActivity() {
         submitRatingButton = findViewById(R.id.submit_rating_button)
         saveForLaterButton = findViewById(R.id.save_for_later_image)
 
+        //SharedPref
         newsId = intent.getIntExtra("news_id", -1)
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         memId = sharedPreferences.getInt("memId", -1)
@@ -89,12 +90,11 @@ class NewsDetailsActivity : AppCompatActivity() {
     private fun submitRating(newsId: Int) {
         val selectedRating = ratingBar.rating // Get rating from RatingBar
 
-        // ดึง member ID จาก SharedPreferences
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val memId = sharedPreferences.getInt("memId", -1)
 
         if (memId == -1) {
-            Toast.makeText(this, "ไม่พบ Member ID", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "ไม่พบ ID ผู้ใช้", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -117,8 +117,6 @@ class NewsDetailsActivity : AppCompatActivity() {
             })
     }
 
-
-    // Fetch news details from API
     private fun fetchNewsDetails(newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getNewsById(newsId).enqueue(object : Callback<NewsData> {
@@ -131,7 +129,7 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<NewsData>, t: Throwable) {
-                // Handle failure
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดรายละเอียดข่าว: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -147,24 +145,21 @@ class NewsDetailsActivity : AppCompatActivity() {
             apiService.postTotalRead(totalRead).enqueue(object : Callback<Total_ReadData> {
                 override fun onResponse(call: Call<Total_ReadData>, response: Response<Total_ReadData>) {
                     if (response.isSuccessful) {
-                        Log.d("NewsDetailsActivity", "Read count increased successfully")
                         fetchReadCount(newsId) // อัปเดตจำนวนการอ่านใน UI
                     } else {
-                        Log.e("NewsDetailsActivity", "Failed to increase read count")
+                        Log.e("NewsDetailsActivity", "เพิ่มจำนวนการอ่านข่าวไม่สำเร็จ")
                     }
                 }
 
                 override fun onFailure(call: Call<Total_ReadData>, t: Throwable) {
-                    Log.e("NewsDetailsActivity", "Error: ${t.message}")
+                    Log.e("NewsDetailsActivity", "เกิดข้อผิดพลาด: ${t.message}")
                 }
             })
         } else {
-            Log.e("NewsDetailsActivity", "Failed to retrieve member ID")
+            Log.e("NewsDetailsActivity", "ล้มเหลวในการดึงข้อมูลสมาชิก")
         }
     }
 
-
-    // Fetch read count from API
     private fun fetchReadCount(newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -181,12 +176,11 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                // Handle failure
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดคะแนนข่าว: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // Fetch news rating from API
     private fun fetchRating(news: NewsData) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -209,12 +203,11 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                // Handle failure
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดคะแนนข่าว: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // Fetch category name from API
     private fun fetchCategoryName(catId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getCategoryById(catId).enqueue(object : Callback<CategoryData> {
@@ -225,12 +218,11 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<CategoryData>, t: Throwable) {
-                // Handle failure
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดชื่อหมวดหมู่ข่าว: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // Fetch major level from API
     private fun fetchMajorLevel(majorId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getMajorById(majorId).enqueue(object : Callback<MajorData> {
@@ -247,12 +239,12 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<MajorData>, t: Throwable) {
-                // Handle failure
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดระดับความสำคัญ: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // Fetch and format date
+    // format และ ดึงวันที่
     private fun fetchFormattedDate(dateString: String) {
         val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
         val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
@@ -261,7 +253,7 @@ class NewsDetailsActivity : AppCompatActivity() {
         newsDate.text = formattedDate
     }
 
-    // Fetch and display images excluding cover image
+    // ดึงข้อมูลรูปภาพข่าวทั้งหมด ยกเว้นรูปภาพหน้าปก
     private fun fetchImages(newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getCoverImage(newsId).enqueue(object : Callback<List<PictureData>> {
@@ -292,7 +284,8 @@ class NewsDetailsActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                // Handle failure
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดรูปภาพข่าว: ${t.message}", Toast.LENGTH_SHORT).show()
+
             }
         })
     }
@@ -300,7 +293,6 @@ class NewsDetailsActivity : AppCompatActivity() {
     private fun fetchNewsSubCategories(newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
-        // Fetch subcategory IDs from News_Sub_Cate table
         apiService.getNewsSubCateByNewsId(newsId).enqueue(object : Callback<List<News_Sub_CateData>> {
             override fun onResponse(call: Call<List<News_Sub_CateData>>, response: Response<List<News_Sub_CateData>>) {
                 if (response.isSuccessful) {
@@ -308,18 +300,17 @@ class NewsDetailsActivity : AppCompatActivity() {
                     if (subCategoryIds.isEmpty()) {
                         newsSubCategory.text = "แท็กข่าว: ไม่มีหมวดหมู่รอง"
                     } else {
-                        // Fetch subcategory names from Sub_Category table using the fetched subcategory IDs
                         fetchSubCategoryNames(subCategoryIds)
                     }
                 } else {
-                    Log.e("NewsDetailsActivity", "Failed to fetch news subcategories: ${response.errorBody()?.string()}")
-                    newsSubCategory.text = "แท็กข่าว: ไม่สามารถดึงหมวดหมู่รองได้"
+                    Log.e("NewsDetailsActivity", "ดึงข้อมูลแท็กข่าวไม่สำเร็จ: ${response.errorBody()?.string()}")
+                    newsSubCategory.text = "แท็กข่าว: ไม่สามารถดึงแท็กข่าวได้"
                 }
             }
 
             override fun onFailure(call: Call<List<News_Sub_CateData>>, t: Throwable) {
-                Log.e("NewsDetailsActivity", "Error fetching news subcategories: ${t.message}")
-                newsSubCategory.text = "แท็กข่าว: เกิดข้อผิดพลาดในการดึงหมวดหมู่รอง"
+                newsSubCategory.text = "แท็กข่าว: เกิดข้อผิดพลาดในการดึงข้อมูลแท็กข่าว"
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดแท็กข่าว: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -332,20 +323,20 @@ class NewsDetailsActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val subCategories = response.body() ?: listOf()
                     if (subCategories.isEmpty()) {
-                        newsSubCategory.text = "แท็กข่าว: ไม่มี"
+                        newsSubCategory.text = "แท็กข่าว: ไม่มีหมวดหมู่รอง"
                     } else {
                         val subCategoryNames = subCategories.map { it.subCatName }
                         newsSubCategory.text = "แท็กข่าว: ${subCategoryNames.joinToString(", ")}"
                     }
                 } else {
-                    Log.e("NewsDetailsActivity", "Failed to fetch subcategories: ${response.errorBody()?.string()}")
-                    newsSubCategory.text = "แท็กข่าว: ไม่สามารถดึงแท็กข่าวได้"
+                    Log.e("NewsDetailsActivity", "ดึงชื่อหมวดหมู่รองไม่สำเร็จ: ${response.errorBody()?.string()}")
+                    newsSubCategory.text = "แท็กข่าว: ไม่สามารถดึงชื่อหมวดหมู่รองได้"
                 }
             }
 
             override fun onFailure(call: Call<List<Sub_CategoryData>>, t: Throwable) {
-                Log.e("NewsDetailsActivity", "Error fetching subcategories: ${t.message}")
-                newsSubCategory.text = "แท็กข่าว: เกิดข้อผิดพลาดในการดึงแท็กข่าว"
+                newsSubCategory.text = "แท็กข่าว: เกิดข้อผิดพลาดในการดึงชื่อหมวดหมู่รอง"
+                Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาดในการโหลดชื่อหมวดหมู่รอง: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -359,13 +350,10 @@ class NewsDetailsActivity : AppCompatActivity() {
         newsTitle.text = news.newsName
         newsDetails.text = news.newsDetails
 
-        // Fetch and display news subcategories
         fetchNewsSubCategories(news.newsId)
 
-        // Fetch and display images excluding cover image
         fetchImages(news.newsId)
 
-        // Save the news to visit history
         addReadHistory(news.newsId)
     }
 
@@ -380,16 +368,16 @@ class NewsDetailsActivity : AppCompatActivity() {
             apiService.addReadHistory(readHistory).enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (!response.isSuccessful) {
-                        Toast.makeText(this@NewsDetailsActivity, "Failed to add read history", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@NewsDetailsActivity, "ไม่สามารถเพิ่มประวัติการอ่านได้", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Toast.makeText(this@NewsDetailsActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@NewsDetailsActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         } else {
-            Toast.makeText(this, "Member ID not found", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "ไม่พบสมาชิกในระบบ", Toast.LENGTH_SHORT).show()
         }
     }
 

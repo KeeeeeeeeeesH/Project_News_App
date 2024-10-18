@@ -18,7 +18,7 @@ class MyApplication : Application() {
             val importance = NotificationManager.IMPORTANCE_HIGH  // ใช้ IMPORTANCE_HIGH
             val channel = NotificationChannel(channelId, channelName, importance).apply {
                 description = "Channel for important news notifications"
-                enableVibration(true)  // เปิดการสั่นเพื่อเน้นการแจ้งเตือน
+                enableVibration(true)
                 setShowBadge(true)
             }
 

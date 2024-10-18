@@ -31,7 +31,6 @@ data class OtpResponse(
     val details: OtpDetails?
 )
 
-
 data class OtpDetails(
     val code: String?,
     val status: String?,

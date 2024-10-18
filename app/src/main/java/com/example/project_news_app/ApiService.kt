@@ -16,6 +16,7 @@ interface ApiService {
     @POST("api/loginMember/login")
     fun loginMember(@Body request: LoginRequest): Call<LoginResponse>
 
+
     //OTP Request/Verify + ResetPassword
     @POST("api/recovery_member/request-otp")
     fun requestOtp(@Body phoneNumber: PhoneNumberRequest): Call<OtpResponse>
@@ -24,19 +25,22 @@ interface ApiService {
     @POST("api/reset_password_member/reset-password")
     fun resetPassword(@Body request: ResetPasswordRequest): Call<ResetPasswordResponse>
 
-    //MemberData
+
+    //Member
     @POST("api/member")
     fun postMember(@Body member: MemberData): Call<MemberData>
     @PUT("api/member/{id}")
     fun updateMember(@Path("id") memId: Int, @Body memberData: MemberData): Call<MemberData>
 
-    //CategoryData
+
+    //Category
     @GET("api/category")
     fun getCategory(): Call<List<CategoryData>>
     @GET("api/category/{id}")
     fun getCategoryById(@Path("id") catId: Int): Call<CategoryData>
 
-    //NewsData
+
+    //News
     @GET("api/news")
     fun getAllNews(): Call<List<NewsData>>
     @GET("api/news/category/{id}")
@@ -49,11 +53,12 @@ interface ApiService {
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
 
 
-    //PictureData
+    //Picture
     @GET("api/picture/news/{newsId}")
     fun getCoverImage(@Path("newsId") newsId: Int): Call<List<PictureData>>
 
-    //News_RatingData
+
+    //News_Rating
     @GET("api/news_rating")
     fun getNewsRating(): Call<List<News_RatingData>>
     @PUT("api/news_rating/{memId}/{newsId}")
@@ -63,25 +68,30 @@ interface ApiService {
         @Body newsRating: News_RatingData
     ): Call<ResponseBody>
 
-    //Total_ReadData
+
+    //Total_Read
     @GET("api/total_read")
     fun getTotalRead(): Call<List<Total_ReadData>>
     @POST("api/total_read")
     fun postTotalRead(@Body totalRead: Total_ReadData): Call<Total_ReadData>
 
-    //Sub_CategoryData
+
+    //Sub_Category
     @GET("api/sub_category/tag/ids")
     fun getSubcategoriesByIds(@Query("ids") ids: List<Int>): Call<List<Sub_CategoryData>>
 
-    //News_Sub_CateData
+
+    //News_Sub_Cate
     @GET("api/news_sub_cate/tag/{newsId}")
     fun getNewsSubCateByNewsId(@Path("newsId") newsId: Int): Call<List<News_Sub_CateData>>
 
-    //MajorData
+
+    //Major
     @GET("api/major/{id}")
     fun getMajorById(@Path("id") majorId: Int): Call<MajorData>
 
-    //Favorite_CategoryData
+
+    //Favorite_Category
     @GET("api/favorite_category/{id}")
     fun getFavoriteCategoryByMemId(@Path("id") memId: Int): Call<List<Favorite_CategoryData>>
     @POST("api/favorite_category/update")
@@ -89,13 +99,15 @@ interface ApiService {
     @GET("api/favorite_category/news")
     fun getNewsByFavoriteCategory(@Query("memId") memId: Int): Call<List<NewsData>>
 
-    //Read_LaterData
+
+    //Read_Later
     @GET("api/read_later/{memId}")
     fun getReadLaterByMemId(@Path("memId") memId: Int): Call<List<Read_LaterData>>
     @POST("api/read_later")
     fun postReadLater(@Body readLater: Read_LaterData): Call<Void>
 
-    //Read_HistoryData
+
+    //Read_History
     @GET("api/read_history/{memId}")
     fun getReadHistoryByMemId(@Path("memId") memId: Int): Call<List<Read_HistoryData>>
     @POST("api/read_history")

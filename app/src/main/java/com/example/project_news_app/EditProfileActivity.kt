@@ -52,7 +52,7 @@ class EditProfileActivity : AppCompatActivity() {
             val newEmail = emailEditText.text.toString().trim()
 
             if (newUsername.isEmpty() || newFname.isEmpty() || newLname.isEmpty() || newPhone.isEmpty() || newEmail.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "กรุณากรอกข้อมูลให้ครบทุกช่อง", Toast.LENGTH_SHORT).show()
             } else {
                 // Update user data
                 val memId = sharedPreferences.getInt("memId", 0)
@@ -76,18 +76,18 @@ class EditProfileActivity : AppCompatActivity() {
                             editor.putString("phone", newPhone)
                             editor.putString("email", newEmail)
                             editor.apply()
-                            Toast.makeText(this@EditProfileActivity, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@EditProfileActivity, "อัพเดทข้อมูลส่วนตัวสำเร็จ", Toast.LENGTH_SHORT).show()
 
                             // Set result and finish
                             setResult(RESULT_OK)
                             finish()
                         } else {
-                            Toast.makeText(this@EditProfileActivity, "Failed to update profile", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@EditProfileActivity, "อัพเดทข้อมูลส่วนตัวล้มเหลว", Toast.LENGTH_SHORT).show()
                         }
                     }
 
                     override fun onFailure(call: Call<MemberData>, t: Throwable) {
-                        Toast.makeText(this@EditProfileActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@EditProfileActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                     }
                 })
             }

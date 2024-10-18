@@ -32,21 +32,21 @@ class RecoveryActivity : AppCompatActivity() {
         otpEditText.isEnabled = false
         okButton.isEnabled = false
 
-        // ฟังก์ชันสำหรับการขอ OTP
+        // ขอOTP
         sendOtpButton.setOnClickListener {
             val phoneNumber = phoneNumberEditText.text.toString().trim()
             if (phoneNumber.isEmpty()) {
-                Toast.makeText(this, "Please enter your phone number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "กรุณากรอกหมายเลขโทรศัพท์", Toast.LENGTH_SHORT).show()
             } else {
                 requestOtp(phoneNumber)
             }
         }
 
-        // ฟังก์ชันสำหรับตรวจสอบ OTP
+        // ตรวจสอบ OTP
         okButton.setOnClickListener {
             val otp = otpEditText.text.toString().trim()
             if (otp.isEmpty()) {
-                Toast.makeText(this, "Please enter the OTP", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "กรุณากรอกรหัส OTP", Toast.LENGTH_SHORT).show()
             } else {
                 verifyOtp(otp)
             }
@@ -71,20 +71,20 @@ class RecoveryActivity : AppCompatActivity() {
                     // แสดง dialog ว่า OTP ถูกส่งแล้ว
                     showOtpSentDialog()
                 } else {
-                    // ถ้า response body ไม่ถูกต้อง แสดงข้อความว่า "Failed to send OTP"
-                    val errorMessage = otpResponse?.message ?: "Failed to send OTP"
+                    // ถ้า response body ไม่ถูกต้อง ให้แสดงข้อความ
+                    val errorMessage = otpResponse?.message ?: "ส่ง OTP ไม่สำเร็จ"
                     Toast.makeText(this@RecoveryActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<OtpResponse>, t: Throwable) {
                 // แสดงข้อความเมื่อเกิดข้อผิดพลาดในการเชื่อมต่อ API
-                Toast.makeText(this@RecoveryActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RecoveryActivity, "มีข้อผิดพลาดเกิดขึ้น: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
-    // ฟังก์ชันสำหรับตรวจสอบ OTP
+    // ฟังก์ชันตรวจสอบ OTP
     private fun verifyOtp(otp: String) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = OtpRequest(otp = otp)
@@ -100,13 +100,13 @@ class RecoveryActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 } else {
-                    val errorMessage = otpResponse?.message ?: "Invalid OTP"
+                    val errorMessage = otpResponse?.message ?: "รหัส OTP ไม่ถูกต้อง"
                     Toast.makeText(this@RecoveryActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<OtpResponse>, t: Throwable) {
-                Toast.makeText(this@RecoveryActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RecoveryActivity, "มีข้อผิดพลาดเกิดขึ้น: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -115,7 +115,7 @@ class RecoveryActivity : AppCompatActivity() {
     // ฟังก์ชันแสดง dialog เมื่อ OTP ถูกส่งสำเร็จ
     private fun showOtpSentDialog() {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage("OTP Sent Successfully")
+        builder.setMessage("ส่ง OTP สำเร็จ")
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
             }

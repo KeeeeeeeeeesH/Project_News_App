@@ -48,7 +48,6 @@ class ProfileActivity : AppCompatActivity() {
 
         val logoutButton = findViewById<Button>(R.id.logout_button)
         logoutButton.setOnClickListener {
-            // Clear login status
             editor.clear()
             editor.apply()
 

@@ -68,12 +68,12 @@ class SearchResultActivity : AppCompatActivity() {
                     allNewsList = response.body() ?: listOf()
                     onLoaded()  // เรียกเมื่อโหลดข่าวเสร็จสิ้น
                 } else {
-                    Toast.makeText(this@SearchResultActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SearchResultActivity, "โหลดข้อมูลข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
-                Toast.makeText(this@SearchResultActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SearchResultActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -83,7 +83,7 @@ class SearchResultActivity : AppCompatActivity() {
             it.newsName.contains(query, ignoreCase = true)
         }.distinctBy { it.newsId }
 
-        fetchReadCounts(filteredNewsList) // Fetch read counts for filtered news
+        fetchReadCounts(filteredNewsList)
     }
 
     private fun searchNewsByDate(query: String) {
@@ -91,7 +91,7 @@ class SearchResultActivity : AppCompatActivity() {
             it.dateAdded != null && isDateMatch(it.dateAdded, query)
         }.distinctBy { it.newsId }
 
-        fetchReadCounts(filteredNewsList) // Fetch read counts for filtered news
+        fetchReadCounts(filteredNewsList)
     }
 
     private fun searchNewsByDateRange(startDateStr: String, endDateStr: String) {
@@ -101,7 +101,7 @@ class SearchResultActivity : AppCompatActivity() {
         val endDate = dateFormat.parse(endDateStr)
 
         if (startDate == endDate) {
-            Toast.makeText(this, "กรุณาเลือกวันที่แตกต่างกัน", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "กรุณาเลือกวันที่ที่แตกต่างกัน", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -136,14 +136,14 @@ class SearchResultActivity : AppCompatActivity() {
                     newsList.forEach { news ->
                         news.readCount = readCounts.count { it.newsId == news.newsId }
                     }
-                    fetchRatings(newsList) // Fetch ratings after fetching read counts
+                    fetchRatings(newsList)
                 } else {
-                    Toast.makeText(this@SearchResultActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SearchResultActivity, "โหลดข้อมูลยอดการอ่านข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                Toast.makeText(this@SearchResultActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SearchResultActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -164,12 +164,12 @@ class SearchResultActivity : AppCompatActivity() {
                     }
                     fetchCoverImages(newsList)
                 } else {
-                    Toast.makeText(this@SearchResultActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SearchResultActivity, "โหลดข้อมูลคะแนนข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                Toast.makeText(this@SearchResultActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SearchResultActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -185,15 +185,15 @@ class SearchResultActivity : AppCompatActivity() {
                         news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@SearchResultActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
                         newsAdapter.notifyDataSetChanged()
                     } else {
-                        Toast.makeText(this@SearchResultActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@SearchResultActivity, "โหลดรูปภาพข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                    Toast.makeText(this@SearchResultActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SearchResultActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }
-        newsAdapter.setNews(newsList) // Refresh list after fetching all data
+        newsAdapter.setNews(newsList) // รีเฟรชรายการข่าวหลังจากดึงข้อมูลทั้งหมด
     }
 }

@@ -30,7 +30,6 @@ class SearchNewsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search_news)
 
-        // Bind the views with findViewById
         searchByNameEditText = findViewById(R.id.search_by_name_edit_text)
         searchByDateEditText = findViewById(R.id.search_by_date_edit_text)
         startDateEditText = findViewById(R.id.start_date_edit_text)
@@ -163,13 +162,12 @@ class SearchNewsActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        // เรียก super ก่อนการจัดการ Intent ใหม่
         super.onBackPressed()
         // ใช้ Intent ที่ไม่ซ้ำกันเพื่อลบ stack เดิม
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
-        finish() // จบการทำงานของ SearchNewsActivity
+        finish()
     }
 
 

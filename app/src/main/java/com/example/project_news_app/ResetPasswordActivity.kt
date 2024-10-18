@@ -30,9 +30,9 @@ class ResetPasswordActivity : AppCompatActivity() {
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
             if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "กรุณากรอกข้อมูลทุกช่อง", Toast.LENGTH_SHORT).show()
             } else if (newPassword != confirmPassword) {
-                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "รหัสผ่านไม่ตรงกัน", Toast.LENGTH_SHORT).show()
             } else {
                 resetPassword(newPassword, confirmPassword)
             }
@@ -48,20 +48,20 @@ class ResetPasswordActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body()?.success == true) {
                     showResetSuccessDialog()
                 } else {
-                    val errorMessage = response.body()?.message ?: "Reset password failed"
+                    val errorMessage = response.body()?.message ?: "เปลี่ยนรหัสผ่านไม่สำเร็จ"
                     Toast.makeText(this@ResetPasswordActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ResetPasswordResponse>, t: Throwable) {
-                Toast.makeText(this@ResetPasswordActivity, "An error occurred: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ResetPasswordActivity, "มีข้อผิดพลาดเกิดขึ้น: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun showResetSuccessDialog() {
         val builder = AlertDialog.Builder(this)
-        builder.setMessage("Password reset successful")
+        builder.setMessage("เปลี่ยนรหัสผ่านสำเร็จ")
             .setPositiveButton("OK") { dialog, id ->
                 dialog.dismiss()
                 val intent = Intent(this@ResetPasswordActivity, LoginActivity::class.java)

@@ -8,7 +8,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.net.CookieManager
 import java.net.CookiePolicy
-
 object RetrofitClient {
     private val cookieManager by lazy {
         CookieManager().apply {

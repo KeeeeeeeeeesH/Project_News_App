@@ -18,7 +18,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.d("FCM", "Message Received from: ${remoteMessage.from}")
 
-        // ตรวจสอบว่า Data Payload ถูกส่งมา
+        // ตรวจสอบ Data Payload ถูกส่งมา
         if (remoteMessage.data.isNotEmpty()) {
             val title = remoteMessage.data["title"] ?: "ข่าวสำคัญ"
             val message = remoteMessage.data["body"] ?: "เนื้อหาใหม่"
@@ -48,7 +48,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
         val intent = Intent(this, NewsDetailsActivity::class.java).apply {
-            putExtra("news_id", newsId.toInt())  // ส่ง news_id ไปที่ NewsDetailsActivity
+            putExtra("news_id", newsId.toInt())  // ส่ง news_id ไปที่ หน้าเนื้อหาข่าว
             putExtra("news_title", title)
             putExtra("news_content", message)
         }
@@ -58,15 +58,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         )
 
         val builder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.notifications)  // ไอคอนของคุณ
+            .setSmallIcon(R.drawable.notifications)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-            .setColor(ContextCompat.getColor(this, R.color.blue))  // กำหนดสีที่ต้องการ
-            .setColorized(true)  // เปิดให้เปลี่ยนสีได้
+            .setColor(ContextCompat.getColor(this, R.color.blue))
+            .setColorized(true)
 
         try {
             with(NotificationManagerCompat.from(this)) {

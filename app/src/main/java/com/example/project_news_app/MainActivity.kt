@@ -120,9 +120,9 @@ class MainActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().subscribeToTopic("news_topic")
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Log.d("FCM", "Subscribed to news_topic successfully")
+                    Log.d("FCM", "สมัครรับข้อมูลจาก news_topic สำเร็จ")
                 } else {
-                    Log.d("FCM", "Failed to subscribe to news_topic")
+                    Log.d("FCM", "สมัครรับข้อมูลจาก news_topic ล้มเหลว")
                 }
             }
 
@@ -132,13 +132,13 @@ class MainActivity : AppCompatActivity() {
             FirebaseMessaging.getInstance().subscribeToTopic("user_$memId")
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("FCM", "Subscribed to user_$memId successfully")
+                        Log.d("FCM", "การสมัครรับข้อมูลโดย user_$memId สำเร็จ")
                     } else {
-                        Log.d("FCM", "Failed to subscribe to user_$memId")
+                        Log.d("FCM", "การสมัครรับข้อมูลโดย user_$memId ล้มเหลว")
                     }
                 }
         } else {
-            Log.e("FCM", "Failed to retrieve memId for subscribing to user topic")
+            Log.e("FCM", "ล้มเหลวในการรับข้อมูลผู้ใช้ไปยังการสมัครรับข้อมูล")
         }
 
     }
@@ -161,12 +161,12 @@ class MainActivity : AppCompatActivity() {
                     val allCategories = listOf(CategoryData(0, "แนะนำ")) + categories
                     categoryAdapter.setCategories(allCategories)
                 } else {
-                    Toast.makeText(this@MainActivity, "Failed to load categories", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "โหลดข้อมูลหมวดหมู่ไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<CategoryData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -202,14 +202,14 @@ class MainActivity : AppCompatActivity() {
                     currentPage++
                     swipeRefreshLayout.isRefreshing = false
                 } else {
-                    Toast.makeText(this@MainActivity, "Failed to load news", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "โหลดข้อมูลข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                     swipeRefreshLayout.isRefreshing = false
                 }
             }
 
             override fun onFailure(call: Call<List<NewsData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                swipeRefreshLayout.isRefreshing = false // Stop the refreshing indicator
+                Toast.makeText(this@MainActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
+                swipeRefreshLayout.isRefreshing = false
             }
         })
     }
@@ -226,12 +226,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     fetchRatings(newsList)
                 } else {
-                    Toast.makeText(this@MainActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "โหลดยอดการอ่านไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -253,12 +253,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     fetchCoverImages(newsList)
                 } else {
-                    Toast.makeText(this@MainActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "โหลดคะแนนข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -274,12 +274,12 @@ class MainActivity : AppCompatActivity() {
                         news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
                         newsAdapter.notifyDataSetChanged()
                     } else {
-                        Toast.makeText(this@MainActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "โหลดรูปภาพหน้าปกข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                    Toast.makeText(this@MainActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }

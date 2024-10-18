@@ -95,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
                         "Response: $loginResponse"
                     )
                     if (loginResponse?.success == true) {
-                        // Save login status and user details in SharedPreferences
+                        // บันทึกข้อมูลการล็อคอินเข้า SharedPreference
                         editor.putBoolean("isLoggedIn", true)
                         editor.putInt("memId", loginResponse.user?.memId ?: 0)
                         editor.putString("username", loginResponse.user?.memUsername)
@@ -105,19 +105,17 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString("email", loginResponse.user?.memEmail)
                         editor.apply()
 
-                        // Navigate to MainActivity
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {
                         Toast.makeText(
                             this@LoginActivity,
-                            loginResponse?.message ?: "ล็อคอินไม่สำเร็จ เกิดข้อผิดพลาดที่ไม่คาดคิด",
+                            loginResponse?.message ?: "ล็อคอินไม่สำเร็จ เกิดข้อผิดพลาด",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 } else {
-                    val errorMessage = response.errorBody()?.string()
                     Toast.makeText(
                         this@LoginActivity,
                         "ชื่อผู้ใช้อีเมล์ หรือรหัสผ่านไม่ถูกต้อง",
@@ -129,7 +127,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
                 Toast.makeText(
                     this@LoginActivity,
-                    "An error occurred: ${t.message}",
+                    "เกิดข้อผิดพลาด: ${t.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }

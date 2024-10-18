@@ -78,16 +78,16 @@ class ReadLaterActivity : AppCompatActivity() {
                                 newsId = it.newsId,
                                 dateAdded = it.dateAdded,
                                 newsName = it.newsName,
-                                ratingScore = 0f, // Default value, will be updated later
+                                ratingScore = 0f,
                                 coverImage = "",
-                                readCount = 0 // Default value, will be updated later
+                                readCount = 0
                             )
                         }
                     }
-                    // Call the next steps to update read count and ratings
+                    // ดึงข้อมูลการอ่านเมื่อเสร็จสิ้น
                     fetchReadCounts(readLaterWithNewsList)
                 } else {
-                    Toast.makeText(this@ReadLaterActivity, "ไม่สามารถดึงข้อมูลข่าวได้", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ReadLaterActivity, "โหลดข้อมูลข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -108,12 +108,12 @@ class ReadLaterActivity : AppCompatActivity() {
                     }
                     fetchRatings(readLaterWithNewsList)
                 } else {
-                    Toast.makeText(this@ReadLaterActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาดในการดึงข้อมูลการอ่าน", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                Toast.makeText(this@ReadLaterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -134,12 +134,12 @@ class ReadLaterActivity : AppCompatActivity() {
                     }
                     fetchCoverImages(readLaterWithNewsList)
                 } else {
-                    Toast.makeText(this@ReadLaterActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาดในการโหลดคะแนนข่าว", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                Toast.makeText(this@ReadLaterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -155,16 +155,16 @@ class ReadLaterActivity : AppCompatActivity() {
                         news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@ReadLaterActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
                         newsAdapter.notifyDataSetChanged()
                     } else {
-                        Toast.makeText(this@ReadLaterActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาดในการโหลดรูปภาพหน้าปก", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                    Toast.makeText(this@ReadLaterActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ReadLaterActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }
-        newsAdapter.setNews(readLaterWithNewsList) // Add this line
+        newsAdapter.setNews(readLaterWithNewsList)
     }
 }
 

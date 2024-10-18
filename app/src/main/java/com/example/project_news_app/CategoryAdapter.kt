@@ -20,7 +20,6 @@ class CategoryAdapter(
         categories = newCategories
         notifyDataSetChanged()
     }
-
     fun setSelectedCategory(catId: Int) {
         selectedCategoryId = catId
         notifyDataSetChanged()

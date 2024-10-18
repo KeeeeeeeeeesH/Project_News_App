@@ -137,14 +137,13 @@ class SelectFavoriteActivity : AppCompatActivity() {
     }
 
     private fun loadAllCategories() {
-        Log.d("SelectFavoriteActivity", "Loading all categories...")
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         categoriesContainer.removeAllViews()
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
                 if (response.isSuccessful) {
                     response.body()?.forEach { category ->
-                        Log.d("SelectFavoriteActivity", "Adding category: ${category.catName}")
+
                         val checkBox = CheckBox(this@SelectFavoriteActivity).apply {
                             text = category.catName
                             isChecked = existingCategories.contains(category.catId)
@@ -168,13 +167,12 @@ class SelectFavoriteActivity : AppCompatActivity() {
                         categoriesContainer.addView(checkBox)
                     }
                 } else {
-                    Log.e("SelectFavoriteActivity", "Failed to load categories")
+                    Log.e("SelectFavoriteActivity", "โหลดหมวดหมู่ข่าวไม่สำเร็จ")
                     Toast.makeText(this@SelectFavoriteActivity, "ไม่สามารถดึงข้อมูลหมวดหมู่ได้", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<CategoryData>>, t: Throwable) {
-                Log.e("SelectFavoriteActivity", "Error loading categories: ${t.message}")
                 Toast.makeText(this@SelectFavoriteActivity, "เกิดข้อผิดพลาดในการโหลดหมวดหมู่", Toast.LENGTH_SHORT).show()
             }
         })

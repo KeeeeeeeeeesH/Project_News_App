@@ -39,7 +39,6 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         // ซ่อน Title ที่มากับ Toolbar เพื่อใช้ TextView ตรงกลางแทน
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // การกำหนดค่า UI Components
         selectedCategoriesTextView = findViewById(R.id.selected_categories_text_view)
         favoriteNewsRecyclerView = findViewById(R.id.recycler_view)
         bottomNavigation = findViewById(R.id.bottom_navigation)
@@ -60,7 +59,6 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // การตั้งค่าปุ่มนำทางล่าง
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
@@ -78,7 +76,6 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             }
         }
 
-        // ดึง memId จาก SharedPreferences
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         memId = sharedPreferences.getInt("memId", -1)
 
@@ -114,7 +111,6 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             }
         })
     }
-
 
     private fun fetchFavoriteNews() {
         progressBar.visibility = View.VISIBLE
@@ -181,12 +177,12 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                     }
                     fetchRatings(newsList)
                 } else {
-                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Failed to load read counts", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดยอดการอ่านข่าวได้", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<Total_ReadData>>, t: Throwable) {
-                Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MyFavoriteCategoryNewsActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -207,12 +203,12 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                     }
                     fetchCoverImages(newsList)
                 } else {
-                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Failed to load ratings", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดคะแนนข่าวได้", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<List<News_RatingData>>, t: Throwable) {
-                Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MyFavoriteCategoryNewsActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -228,12 +224,12 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                         news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@MyFavoriteCategoryNewsActivity).baseUrl()}uploads/${it.pictureName}" } ?: ""
                         newsAdapter.notifyDataSetChanged()
                     } else {
-                        Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Failed to load cover images", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดรูปภาพข่าวได้", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onFailure(call: Call<List<PictureData>>, t: Throwable) {
-                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MyFavoriteCategoryNewsActivity, "เกิดข้อผิดพลาด: ${t.message}", Toast.LENGTH_SHORT).show()
                 }
             })
         }
