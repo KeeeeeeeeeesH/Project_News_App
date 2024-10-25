@@ -95,6 +95,7 @@ dependencies {
     implementation("com.mikepenz:iconics-core:5.3.4")
     implementation("com.mikepenz:iconics-views:5.3.4")
     implementation("com.mikepenz:fontawesome-typeface:5.9.0.1-kotlin@aar")
+    implementation("androidx.startup:startup-runtime:1.1.1")
 
     //CookieManager
     implementation("com.squareup.okhttp3:okhttp:4.9.3")

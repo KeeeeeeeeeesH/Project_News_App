@@ -4,11 +4,14 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.mikepenz.iconics.Iconics
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        Iconics.registerFont(FontAwesome)
     }
 
     private fun createNotificationChannel() {
