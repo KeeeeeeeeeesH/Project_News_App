@@ -1,23 +1,12 @@
 <resources>
     <string name="app_name">CO-daily</string>
-    <string name="hint_username">email or username</string>
-    <string name="hint_password">password</string>
-    <string name="login">Login</string>
-    <string name="login_guest">Login with Guest Account</string>
-    <string name="dont_have_account">Don\'t have an account? </string>
-    <string name="register">Register</string>
-    <string name="forgot_password">Forgot your password? </string>
-    <string name="recovery">Recovery</string>
-    <string name="hint_first_name">first name</string>
-    <string name="hint_last_name">last name</string>
-    <string name="hint_phone_number">phone number</string>
-    <string name="hint_email">email</string>
-    <string name="hint_confirm_password">confirm password</string>
-    <string name="already_have_account">Already have an account? </string>
-    <string name="password_recovery">Password Recovery</string>
-    <string name="send_otp">Send OTP</string>
-    <string name="ok">OK</string>
-    <string name="hint_otp">OTP</string>
+    <string name="hint_username">อีเมล์หรือชื่อผู้ใช้งาน</string>
+    <string name="hint_password">รหัสผ่าน</string>
+    <string name="login">เข้าสู่ระบบ</string>
+    <string name="dont_have_account">ยังไม่มีบัญชีผู้ใช้ ? </string>
+    <string name="register">สมัครสมาชิก</string>
+    <string name="forgot_password">ลืมรหัสผ่าน ? </string>
+    <string name="recovery">กู้คืนรหัสผ่าน</string>
     <string-array name="rating_values">
         <item>0.0</item>
         <item>0.5</item>
@@ -31,9 +20,4 @@
         <item>4.5</item>
         <item>5.0</item>
     </string-array>
-    <string name="search_news">ค้นหาข่าว</string>
-    <string name="enter_news_title">กรอกชื่อหรือหัวข้อข่าว</string>
-    <string name="search">ค้นหา</string>
-    <string name="select_date">ค้นหาจากวันที่ลงข่าว</string>
-    <string name="found_news">ข่าวที่พบ</string>
 </resources>
