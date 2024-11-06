@@ -27,6 +27,11 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
 
+        val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
+
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
