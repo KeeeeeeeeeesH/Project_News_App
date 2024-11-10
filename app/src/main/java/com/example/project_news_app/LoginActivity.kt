@@ -28,9 +28,11 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        //setting sharedPref
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
+        //check login status
         if (sharedPreferences.getBoolean("isLoggedIn", false)) {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -44,11 +46,13 @@ class LoginActivity : AppCompatActivity() {
         val registerTextView = findViewById<TextView>(R.id.register)
         val recoveryTextView = findViewById<TextView>(R.id.recovery)
 
+        //เข้าหน้า register
         registerTextView.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
 
+        //เข้าหน้า recovery
         recoveryTextView.setOnClickListener {
             val intent = Intent(this, RecoveryActivity::class.java)
             startActivity(intent)
@@ -104,7 +108,7 @@ class LoginActivity : AppCompatActivity() {
                         editor.putString("phone", loginResponse.user?.memPhone)
                         editor.putString("email", loginResponse.user?.memEmail)
                         editor.apply()
-
+                        //เข้าหน้า Main
                         val intent = Intent(this@LoginActivity, MainActivity::class.java)
                         startActivity(intent)
                         finish()

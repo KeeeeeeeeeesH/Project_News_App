@@ -16,20 +16,25 @@ class CategoryAdapter(
     private var categories = listOf<CategoryData>()
     private var selectedCategoryId: Int = 0
 
+    //รับ data list ที่จะอัพเดทและแสดง
     fun setCategories(newCategories: List<CategoryData>) {
         categories = newCategories
-        notifyDataSetChanged()
+        notifyDataSetChanged() //refresh รายการ
     }
+
+    //set ให้เป็น id ของหมวดหมู่ที่เลือก
     fun setSelectedCategory(catId: Int) {
         selectedCategoryId = catId
         notifyDataSetChanged()
     }
 
+    //สร้าง ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_category, parent, false)
         return CategoryViewHolder(itemView)
     }
 
+    //ตั้งค่าข้อมูลและการแสดงผล
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
         val category = categories[position]
         holder.categoryName.text = category.catName
@@ -41,8 +46,9 @@ class CategoryAdapter(
         }
     }
 
-    override fun getItemCount() = categories.size
+    override fun getItemCount() = categories.size //คืนค่าจำนวนหมวดหมู่ให้ Recycler
 
+    //เก็บ textview แสดงชื่อ
     class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val categoryName: TextView = itemView.findViewById(R.id.category_name)
     }

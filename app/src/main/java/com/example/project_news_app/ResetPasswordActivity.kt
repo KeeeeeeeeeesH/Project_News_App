@@ -25,10 +25,12 @@ class ResetPasswordActivity : AppCompatActivity() {
         confirmPasswordEditText = findViewById(R.id.etConfirmPassword)
         resetPasswordButton = findViewById(R.id.btnResetPassword)
 
+        //กดเปลี่ยนรหัสผ่าน
         resetPasswordButton.setOnClickListener {
             val newPassword = newPasswordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
+            //เงื่อนไข
             if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "กรุณากรอกข้อมูลทุกช่อง", Toast.LENGTH_SHORT).show()
             } else if (newPassword != confirmPassword) {
@@ -43,6 +45,7 @@ class ResetPasswordActivity : AppCompatActivity() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = ResetPasswordRequest(newPassword, confirmPassword)
 
+        //post new password
         apiService.resetPassword(request).enqueue(object : Callback<ResetPasswordResponse> {
             override fun onResponse(call: Call<ResetPasswordResponse>, response: Response<ResetPasswordResponse>) {
                 if (response.isSuccessful && response.body()?.success == true) {
@@ -59,6 +62,7 @@ class ResetPasswordActivity : AppCompatActivity() {
         })
     }
 
+    //ฟังก์ชันแสดงแจ้งเตือน dialog
     private fun showResetSuccessDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage("เปลี่ยนรหัสผ่านสำเร็จ")

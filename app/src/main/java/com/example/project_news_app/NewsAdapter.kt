@@ -28,32 +28,36 @@ class NewsAdapter(
         FAVORITE, READ_LATER, VISIT_HISTORY, GENERAL
     }
 
+    //update รายการ
     fun setNews(news: List<Any>) {
         this.newsList = news
         notifyDataSetChanged()
     }
 
+    //เพิ่มข่าวลงในรายการเดิม
     fun addNews(news: List<Any>) {
         val currentSize = newsList.size
         newsList = newsList + news
-        notifyItemRangeInserted(currentSize, news.size)
+        notifyItemRangeInserted(currentSize, news.size) //อัพเดทเฉพาะรายการที่เพิ่ม
     }
 
+    //สร้าง ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false)
         return NewsViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
-        val item = newsList[position]
+        val item = newsList[position] //ดึงแต่ละรายการออกมา
 
+        //loop เงื่อนไขของ enum
         when (newsType) {
             NewsType.FAVORITE, NewsType.GENERAL -> {
                 if (item is NewsData) {
-                    // ระบบข่าวอื่นๆ
+                    // ระบบข่าวปกติ และข่าวโปรด
                     holder.newsName.text = item.newsName
 
-                    // Format date
+                    // แปลงวันที่
                     val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH)
                     val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                     val date = originalFormat.parse(item.dateAdded.toString())
@@ -63,7 +67,7 @@ class NewsAdapter(
                     holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"
                     holder.newsRating.text = "คะแนน ★ %.2f".format(item.ratingScore)
 
-                    // Load cover image if available
+                    // โหลดรูปภาพ
                     if (!item.coverImage.isNullOrEmpty()) {
                         Glide.with(holder.itemView.context)
                             .load(item.coverImage)
@@ -72,7 +76,7 @@ class NewsAdapter(
                         holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon)
                     }
 
-                    // Set click listener to open NewsDetailsActivity
+                    // Set click ให้เปิด newsdetails
                     holder.itemView.setOnClickListener {
                         val intent = Intent(holder.itemView.context, NewsDetailsActivity::class.java)
                         intent.putExtra("news_id", item.newsId)
@@ -81,13 +85,14 @@ class NewsAdapter(
                 }
             }
             NewsType.VISIT_HISTORY -> {
+                //ระบบประวัติการอ่าน
                 if (item is ReadHistoryWithNewsData) {
                     holder.newsName.text = item.newsName
                     holder.itemView.findViewById<TextView>(R.id.admin_label).visibility = View.GONE
                     holder.itemView.findViewById<TextView>(R.id.read_date_label).visibility = View.VISIBLE
 
                     val targetFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-                    val formattedDate = targetFormat.format(item.readDate)
+                    val formattedDate = targetFormat.format(item.readDate) //เปลี่ยนเป็นวันที่อ่าน
 
                     holder.newsDate.text = formattedDate
                     holder.newsReadCount.text = "อ่าน ${item.readCount} ครั้ง"  // เปลี่ยนเป็นของสมาชิก
@@ -101,13 +106,14 @@ class NewsAdapter(
                         holder.newsPicture.setImageResource(com.google.android.material.R.drawable.navigation_empty_icon)
                     }
 
+                    //เปิดหน้า newsdetail
                     holder.itemView.setOnClickListener {
                         val intent = Intent(holder.itemView.context, NewsDetailsActivity::class.java)
                         intent.putExtra("news_id", item.newsId)
                         holder.itemView.context.startActivity(intent)
                     }
 
-                    // Set long click listener to delete read history
+                    // Set long click ให้ลบประวัติ
                     holder.itemView.setOnLongClickListener {
                         AlertDialog.Builder(holder.itemView.context)
                             .setTitle("ลบประวัติการอ่าน")
@@ -160,8 +166,9 @@ class NewsAdapter(
         }
     }
 
-    override fun getItemCount() = newsList.size
+    override fun getItemCount() = newsList.size //คืนค่าจำนวนข่าวให้ Recycler
 
+    //เก็บ View ต่าง ๆ
     class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val newsPicture: ImageView = itemView.findViewById(R.id.news_picture)
         val newsName: TextView = itemView.findViewById(R.id.news_name)

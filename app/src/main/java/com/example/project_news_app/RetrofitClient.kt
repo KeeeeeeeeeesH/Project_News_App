@@ -9,12 +9,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.net.CookieManager
 import java.net.CookiePolicy
 object RetrofitClient {
+    //จัดการ cookie
     private val cookieManager by lazy {
         CookieManager().apply {
             setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         }
     }
-
+    //จัดการ log api
     private val okHttpClient by lazy {
         OkHttpClient.Builder()
             .cookieJar(JavaNetCookieJar(cookieManager))
@@ -26,6 +27,7 @@ object RetrofitClient {
 
     private var retrofit: Retrofit? = null
 
+    //สร้าง instance จาก ConfigUtil
     fun getClient(context: Context): Retrofit {
         val baseUrl = ConfigUtil.getBaseUrl(context)
         if (retrofit == null || retrofit?.baseUrl().toString() != baseUrl) {

@@ -18,9 +18,11 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        //ใช้ sharedPref
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
+        //แสดงชื่อ-สกุล
         val fname = sharedPreferences.getString("fname", "")
         val lname = sharedPreferences.getString("lname", "")
         val welcomeTextView = findViewById<TextView>(R.id.member_name)
@@ -30,9 +32,10 @@ class ProfileActivity : AppCompatActivity() {
         val readNewsLaterButton = findViewById<Button>(R.id.readLaterButton)
         val VisitHistoryNewsButton = findViewById<Button>(R.id.NewHistoryButton)
 
+        //ปุ่มเข้าหน้าต่างๆ
         editProfileButton.setOnClickListener {
             val intent = Intent(this, EditProfileActivity::class.java)
-            startActivityForResult(intent, 1)
+            startActivityForResult(intent, 1) //แก้แล้วกลับหน้าเดิมพร้อมอัปเดต
         }
 
         readNewsLaterButton.setOnClickListener {
@@ -45,7 +48,7 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
+        //ออกจากระบบ
         val logoutButton = findViewById<Button>(R.id.logout_button)
         logoutButton.setOnClickListener {
             editor.clear()
@@ -57,6 +60,7 @@ class ProfileActivity : AppCompatActivity() {
             finish()
         }
 
+        //bottom nav
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -78,10 +82,10 @@ class ProfileActivity : AppCompatActivity() {
         bottomNavigation.selectedItemId = R.id.navigation_profile
     }
 
+    //refresh ข้อมูลหลังแก้ไข
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            // Refresh data
             val fname = sharedPreferences.getString("fname", "")
             val lname = sharedPreferences.getString("lname", "")
             val welcomeTextView = findViewById<TextView>(R.id.member_name)

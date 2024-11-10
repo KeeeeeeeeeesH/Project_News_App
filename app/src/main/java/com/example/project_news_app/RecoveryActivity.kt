@@ -28,7 +28,7 @@ class RecoveryActivity : AppCompatActivity() {
         sendOtpButton = findViewById(R.id.send_otp)
         okButton = findViewById(R.id.ok_button)
 
-        // เริ่มต้น disable ช่องกรอก OTP และปุ่ม OK
+        // disable ช่องกรอก OTP และปุ่ม OK
         otpEditText.isEnabled = false
         okButton.isEnabled = false
 
@@ -58,27 +58,27 @@ class RecoveryActivity : AppCompatActivity() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = PhoneNumberRequest(phone = phoneNumber)
 
+        //post request
         apiService.requestOtp(request).enqueue(object : Callback<OtpResponse> {
             override fun onResponse(call: Call<OtpResponse>, response: Response<OtpResponse>) {
                 val otpResponse = response.body()
 
                 // ตรวจสอบว่า response ไม่เป็น null และมีข้อความ success
                 if (otpResponse != null && otpResponse.message == "OTP ถูกส่งสำเร็จ") {
-                    // ปลดล็อคการกรอก OTP และปุ่ม OK เมื่อ OTP ส่งสำเร็จ
+                    // ปลดล็อคการกรอก OTP และปุ่ม OK
                     otpEditText.isEnabled = true
                     okButton.isEnabled = true
-
                     // แสดง dialog ว่า OTP ถูกส่งแล้ว
                     showOtpSentDialog()
                 } else {
-                    // ถ้า response body ไม่ถูกต้อง ให้แสดงข้อความ
+                    // ถ้า response message ไม่ถูกต้อง
                     val errorMessage = otpResponse?.message ?: "ส่ง OTP ไม่สำเร็จ"
                     Toast.makeText(this@RecoveryActivity, errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<OtpResponse>, t: Throwable) {
-                // แสดงข้อความเมื่อเกิดข้อผิดพลาดในการเชื่อมต่อ API
+                // เมื่อเกิดข้อผิดพลาดในการเชื่อมต่อ API
                 Toast.makeText(this@RecoveryActivity, "มีข้อผิดพลาดเกิดขึ้น: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -89,6 +89,7 @@ class RecoveryActivity : AppCompatActivity() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val request = OtpRequest(otp = otp)
 
+        //post verify
         apiService.verifyOtp(request).enqueue(object : Callback<OtpResponse> {
             override fun onResponse(call: Call<OtpResponse>, response: Response<OtpResponse>) {
                 val otpResponse = response.body()
@@ -110,7 +111,6 @@ class RecoveryActivity : AppCompatActivity() {
             }
         })
     }
-
 
     // ฟังก์ชันแสดง dialog เมื่อ OTP ถูกส่งสำเร็จ
     private fun showOtpSentDialog() {

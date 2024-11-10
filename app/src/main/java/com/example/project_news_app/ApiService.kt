@@ -52,7 +52,6 @@ interface ApiService {
     @GET("api/news/{id}")
     fun getNewsById(@Path("id") newsId: Int): Call<NewsData>
 
-
     //Picture
     @GET("api/picture/news/{newsId}")
     fun getCoverImage(@Path("newsId") newsId: Int): Call<List<PictureData>>

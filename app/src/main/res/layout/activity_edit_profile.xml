@@ -145,5 +145,4 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:backgroundTint="@color/purple_500"/>
-
 </RelativeLayout>

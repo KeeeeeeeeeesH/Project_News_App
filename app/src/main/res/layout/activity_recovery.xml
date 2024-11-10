@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="center"
-    android:background="#E0FFFF"> <!-- Light blue background color -->
+    android:background="#E0FFFF">
 
     <TextView
         android:layout_width="wrap_content"

@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
     private var currentCategoryId: Int = 0 // Default ไปที่ "แนะนำ"
     private var currentPage: Int = 0 // index ของหน้าข่าวสำหรับการโหลดข่าวเพิ่ม
-    private var allNewsList: List<NewsData> = listOf() // All news list
+    private var allNewsList: List<NewsData> = listOf() // List ของ News จาก NewsData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,16 +51,17 @@ class MainActivity : AppCompatActivity() {
         newsRecyclerView = findViewById(R.id.news_recycler_view)
         bottomNavigation = findViewById(R.id.bottom_navigation)
 
-
+        //กำหนดค่า RecyclerView กับ Adapter
         categoriesRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         newsRecyclerView.layoutManager = LinearLayoutManager(this)
 
+        //แสดงข่าวตามหมวดหมู่ที่เลือก
         categoryAdapter = CategoryAdapter { category ->
             currentCategoryId = category.catId
             categoryAdapter.setSelectedCategory(category.catId)
             loadNewsByCategory(category.catId)
         }
-        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.GENERAL)
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.GENERAL) //ใช้ Type General
 
         categoriesRecyclerView.adapter = categoryAdapter
         newsRecyclerView.adapter = newsAdapter
@@ -68,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         loadCategories()
         loadNewsByCategory(currentCategoryId)
 
+        //ตั้งค่า bottom nav
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
@@ -86,13 +88,13 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
         bottomNavigation.selectedItemId = R.id.navigation_home
 
-        toggleCategories.setOnClickListener {
-            onToggleCategoriesClick()
-        }
+//        toggleCategories.setOnClickListener {
+//            onToggleCategoriesClick()
+//        }
 
+        //โหลดข่าวเพิ่ม เมื่อ Scroll ลง
         newsRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!recyclerView.canScrollVertically(1)) {
@@ -106,17 +108,20 @@ class MainActivity : AppCompatActivity() {
             loadNewsByCategory(currentCategoryId)
         }
 
+        //เข้าหน้า search
         searchButton.setOnClickListener {
             val intent = Intent(this@MainActivity, SearchNewsActivity::class.java)
-            startActivityForResult(intent, SEARCH_REQUEST_CODE)
+            startActivity(intent)
         }
 
+        //ตรวจสอบเวอร์ชัน SDK ในการขอ permission ส่งแจ้งเตือน
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
             }
         }
 
+        //ให้ user subscribe topic สำหรับรับแจ้งเตือนจาก firebase
         FirebaseMessaging.getInstance().subscribeToTopic("news_topic")
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -126,8 +131,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        //sharedPref
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         val memId = sharedPreferences.getInt("memId", -1)
+
+       //ถ้าเจอ memId ให้ subscribe topic
         if (memId != -1) {
             FirebaseMessaging.getInstance().subscribeToTopic("user_$memId")
                 .addOnCompleteListener { task ->
@@ -143,10 +151,12 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun onToggleCategoriesClick() {
-    }
+//    private fun onToggleCategoriesClick() {
+//    }
 
+    //โหลดหมวดหมู่ข่าว
     private fun loadCategories() {
+        //ตรวจสอบการเชื่อมต่อ internet
         if (!NetworkUtil.isInternetAvailable(this)) {
             showNoInternetError()
             swipeRefreshLayout.isRefreshing = false
@@ -157,8 +167,9 @@ class MainActivity : AppCompatActivity() {
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
                 if (response.isSuccessful) {
+                    //แสดงรายการหมวดหมู่พร้อมหมวดหมู่แนะนำ
                     val categories = response.body() ?: listOf()
-                    val allCategories = listOf(CategoryData(0, "แนะนำ")) + categories
+                    val allCategories = listOf(CategoryData(0, "แนะนำ")) + categories //list ของ category และ แนะนำ
                     categoryAdapter.setCategories(allCategories)
                 } else {
                     Toast.makeText(this@MainActivity, "โหลดข้อมูลหมวดหมู่ไม่สำเร็จ", Toast.LENGTH_SHORT).show()
@@ -171,34 +182,38 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    //โหลดข่าวตามหมวดหมู่
     private fun loadNewsByCategory(catId: Int) {
-        currentPage = 0
+        currentPage = 0 //set index = 0 เพราะจะดึงทีละ 5 ข่าว
         allNewsList = listOf()
         loadMoreNews()
         swipeRefreshLayout.isEnabled = true
     }
 
+    //โหลดข่าวตามหมวดหมู่เพิ่มเรื่อยๆ
     private fun loadMoreNews() {
         if (!NetworkUtil.isInternetAvailable(this)) {
             showNoInternetError()
             swipeRefreshLayout.isRefreshing = false
             return
         }
-
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        //limit 5 ข่าว / ครั้ง
         apiService.getNewsByCategoryPaged(currentCategoryId, currentPage, 5).enqueue(object : Callback<List<NewsData>> {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body() ?: listOf()
-                    val newNewsList = newsList.distinctBy { it.newsId }
+                    val newNewsList = newsList.distinctBy { it.newsId } //ลบถ้าเจอข่าวซ้ำ
+                    //ถ้าโหลดครั้งแรก
                     if (currentPage == 0) {
                         allNewsList = newNewsList
-                        newsAdapter.setNews(newNewsList)
+                        newsAdapter.setNews(newNewsList) //ดึง list ใน adapter มา
                     } else {
+                        //ข่าวเดิม+ข่าวใหม่-ลบข่าวซ้ำ
                         allNewsList = (allNewsList + newNewsList).distinctBy { it.newsId }
-                        newsAdapter.addNews(newNewsList)
+                        newsAdapter.addNews(newNewsList) //เพิ่มข่าวใหม่ลง adapter
                     }
-                    fetchReadCounts(newsList)
+                    fetchReadCounts(newsList) //ดึงจำนวนการอ่าน
                     currentPage++
                     swipeRefreshLayout.isRefreshing = false
                 } else {
@@ -214,6 +229,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงจำนวนการอ่าน
     private fun fetchReadCounts(newsList: List<NewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -221,10 +237,11 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
                 if (response.isSuccessful) {
                     val readCounts = response.body() ?: listOf()
+                    //วนลูปหาจำนวนของแต่ละข่าว
                     newsList.forEach { news ->
                         news.readCount = readCounts.count { it.newsId == news.newsId }
                     }
-                    fetchRatings(newsList)
+                    fetchRatings(newsList) //ไปดึงคะแนนต่อ
                 } else {
                     Toast.makeText(this@MainActivity, "โหลดยอดการอ่านไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
@@ -235,6 +252,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    //ดึงคะแนนข่าว
     private fun fetchRatings(newsList: List<NewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -242,8 +261,10 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
                 if (response.isSuccessful) {
                     val ratings = response.body() ?: listOf()
+                    //loop เหมือนไอตัวข้างบน
                     newsList.forEach { news ->
                         val newsRatings = ratings.filter { it.newsId == news.newsId }
+                        //หาค่าเฉลี่ยของข่าวที่ได้
                         news.ratingScore = if (newsRatings.isNotEmpty()) {
                             newsRatings.sumByDouble { it.ratingScore.toDouble() }
                                 .toFloat() / newsRatings.size
@@ -251,7 +272,7 @@ class MainActivity : AppCompatActivity() {
                             0f
                         }
                     }
-                    fetchCoverImages(newsList)
+                    fetchCoverImages(newsList) //ไปดึงรูปปกต่อ
                 } else {
                     Toast.makeText(this@MainActivity, "โหลดคะแนนข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
                 }
@@ -262,6 +283,8 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    //ดึงรูปหน้าปก
     private fun fetchCoverImages(newsList: List<NewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
 
@@ -270,8 +293,10 @@ class MainActivity : AppCompatActivity() {
                 override fun onResponse(call: Call<List<PictureData>>, response: Response<List<PictureData>>) {
                     if (response.isSuccessful) {
                         val pictures = response.body() ?: listOf()
-                        val coverImage = pictures.find { it.pictureName.startsWith("cover_") }
+                        val coverImage = pictures.find { it.pictureName.startsWith("cover_") } //หาภาพที่ชื่อรูปเป็น cover_
+                        //ตั้งค่าให้ url ของรูป
                         news.coverImage = coverImage?.let { "${RetrofitClient.getClient(this@MainActivity).baseUrl()}uploads/${it.pictureName}" }
+                        //จบทุกอย่างแล้วอัปเดท RecyclerView
                         newsAdapter.notifyDataSetChanged()
                     } else {
                         Toast.makeText(this@MainActivity, "โหลดรูปภาพหน้าปกข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
@@ -284,6 +309,8 @@ class MainActivity : AppCompatActivity() {
             })
         }
     }
+
+    //ตรวจสอบกาสรเชื่อมต่อ
     private fun showNoInternetError() {
         val dialog = AlertDialog.Builder(this)
             .setTitle("ไม่มีการเชื่อมต่ออินเทอร์เน็ต")
@@ -292,8 +319,9 @@ class MainActivity : AppCompatActivity() {
             .create()
         dialog.show()
     }
-    companion object {
-        private const val SEARCH_REQUEST_CODE = 1
-    }
+
+//    companion object {
+//        private const val SEARCH_REQUEST_CODE = 1
+//    }
 }
 

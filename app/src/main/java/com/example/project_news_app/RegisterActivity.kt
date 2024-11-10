@@ -44,6 +44,7 @@ class RegisterActivity : AppCompatActivity() {
             val password = passwordEditText.text.toString().trim()
             val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
+            //เงื่อนไข
             if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 Toast.makeText(this, "กรุณากรอกข้อมูลให้ครบทุกช่อง", Toast.LENGTH_SHORT).show()
             } else if (password != confirmPassword) {
@@ -56,6 +57,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun registerMember(firstName: String, lastName: String, phoneNumber: String, email: String, username: String, password: String) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        //object เก็บข้อมูล
         val memberData = MemberData(
             memId = 0,
             memFname = firstName,
@@ -66,6 +68,7 @@ class RegisterActivity : AppCompatActivity() {
             memPhone = phoneNumber,
         )
 
+        //post ข้อมูล
         apiService.postMember(memberData).enqueue(object : Callback<MemberData> {
             override fun onResponse(call: Call<MemberData>, response: Response<MemberData>) {
                 if (response.isSuccessful) {

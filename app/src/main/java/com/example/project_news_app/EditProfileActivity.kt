@@ -27,11 +27,13 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
 
+       //ตั้งค่า toolbar
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationOnClickListener { onBackPressed() }
 
+        //เก็บค่าลง SharedPref
         sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
 
@@ -42,13 +44,14 @@ class EditProfileActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.emailEditText)
         saveButton = findViewById(R.id.saveButton)
 
-        // Load existing user data
+        //โหลดข้อมูลเดิม
         usernameEditText.setText(sharedPreferences.getString("username", ""))
         fnameEditText.setText(sharedPreferences.getString("fname", ""))
         lnameEditText.setText(sharedPreferences.getString("lname", ""))
         phoneEditText.setText(sharedPreferences.getString("phone", ""))
         emailEditText.setText(sharedPreferences.getString("email", ""))
 
+        //บันทึกข้อมูล
         saveButton.setOnClickListener {
             val newUsername = usernameEditText.text.toString().trim()
             val newFname = fnameEditText.text.toString().trim()
@@ -56,10 +59,11 @@ class EditProfileActivity : AppCompatActivity() {
             val newPhone = phoneEditText.text.toString().trim()
             val newEmail = emailEditText.text.toString().trim()
 
+            //เงื่อนไข
             if (newUsername.isEmpty() || newFname.isEmpty() || newLname.isEmpty() || newPhone.isEmpty() || newEmail.isEmpty()) {
                 Toast.makeText(this, "กรุณากรอกข้อมูลให้ครบทุกช่อง", Toast.LENGTH_SHORT).show()
             } else {
-                // Update user data
+                // เก็บข้อมูลลง object
                 val memId = sharedPreferences.getInt("memId", 0)
                 val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
                 val memberData = MemberData(
@@ -72,6 +76,7 @@ class EditProfileActivity : AppCompatActivity() {
                     memPhone = newPhone
                 )
 
+                //update ข้อมูล
                 apiService.updateMember(memId, memberData).enqueue(object : Callback<MemberData> {
                     override fun onResponse(call: Call<MemberData>, response: Response<MemberData>) {
                         if (response.isSuccessful) {
@@ -82,9 +87,7 @@ class EditProfileActivity : AppCompatActivity() {
                             editor.putString("email", newEmail)
                             editor.apply()
                             Toast.makeText(this@EditProfileActivity, "อัพเดทข้อมูลส่วนตัวสำเร็จ", Toast.LENGTH_SHORT).show()
-
-                            // Set result and finish
-                            setResult(RESULT_OK)
+                            setResult(RESULT_OK) //แจ้งกลับไปที่หน้า Profile
                             finish()
                         } else {
                             Toast.makeText(this@EditProfileActivity, "อัพเดทข้อมูลส่วนตัวล้มเหลว", Toast.LENGTH_SHORT).show()
