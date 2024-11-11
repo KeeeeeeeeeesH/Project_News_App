@@ -6,7 +6,6 @@
     android:background="#E0FFFF"
     tools:context=".SelectFavoriteActivity">
 
-    <!-- Empty State -->
     <LinearLayout
         android:id="@+id/empty_state_container"
         android:layout_width="match_parent"

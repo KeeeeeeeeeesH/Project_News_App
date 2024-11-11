@@ -8,6 +8,7 @@ import com.mikepenz.iconics.Iconics
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 
 class MyApplication : Application() {
+    //ให้สร้าง NotificationChannel ทันทีเมื่อเข้าแอป
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()

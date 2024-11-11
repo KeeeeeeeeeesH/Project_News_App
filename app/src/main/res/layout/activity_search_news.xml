@@ -6,7 +6,7 @@
     tools:context=".SearchNewsActivity"
     android:background="#E0FFFF">
 
-    <!-- Toolbar with back button -->
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -24,6 +24,7 @@
         android:layout_below="@id/toolbar"
         android:layout_centerInParent="true">
 
+        <!-- Search ชื่อ -->
         <TextView
             android:id="@+id/search_title"
             android:layout_width="wrap_content"
@@ -43,7 +44,7 @@
             android:padding="12dp"
             android:minHeight="48dp" />
 
-        <!-- Layout for the button to be aligned on the right -->
+        <!-- ทำ Layout ให้ปุ่มอยู่ด้านขวา -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,6 +61,7 @@
                 android:minHeight="48dp" />
         </RelativeLayout>
 
+        <!-- Search วันที่ -->
         <EditText
             android:id="@+id/search_by_date_edit_text"
             android:layout_width="match_parent"
@@ -72,7 +74,7 @@
             android:padding="12dp"
             android:minHeight="48dp" />
 
-        <!-- Layout for the button to be aligned on the right -->
+        <!-- ทำให้ปุ่มอยู่ด้านขวา -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,7 +91,7 @@
                 android:minHeight="48dp" />
         </RelativeLayout>
 
-        <!-- LinearLayout to display start date and end date on the same line -->
+        <!-- เลือกวันที่เริ่มกับสิ้นสุดในบรรทัดเดียวกัน -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -117,7 +119,7 @@
                 android:minHeight="48dp" />
         </LinearLayout>
 
-        <!-- Layout for the date range button -->
+        <!-- ทำให้ปุ่มอยู่ด้านขวา -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -38,18 +38,15 @@ class SearchNewsActivity : AppCompatActivity() {
         searchByDateButton = findViewById(R.id.search_by_date_button)
         searchByDateRangeButton = findViewById(R.id.search_by_date_range_button)
 
+        //ตั้งค่า toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setNavigationOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-            finish()
-        }
+        toolbar.setNavigationOnClickListener { onBackPressed() }
 
+        //datepicker
         searchByDateEditText.setOnClickListener {
-            showDatePickerDialog(false, true) // สำหรับเลือกวันที่เดียว
+            showDatePickerDialog(false, true) // สำหรับเลือกวันที่อย่างเดียวเดียว
         }
 
         startDateEditText.setOnClickListener {
@@ -60,6 +57,7 @@ class SearchNewsActivity : AppCompatActivity() {
             showDatePickerDialog(false, false) // สำหรับเลือกวันที่สิ้นสุด
         }
 
+        //ปุ่มค้นหาจากชื่อ
         searchByNameButton.setOnClickListener {
             val query = searchByNameEditText.text.toString()
             if (query.isNotBlank()) {
@@ -69,6 +67,7 @@ class SearchNewsActivity : AppCompatActivity() {
             }
         }
 
+        //ปุ่มค้นหาจากวันที่
         searchByDateButton.setOnClickListener {
             val dateString = searchByDateEditText.text.toString()
             if (dateString.isNotBlank()) {
@@ -84,6 +83,7 @@ class SearchNewsActivity : AppCompatActivity() {
             }
         }
 
+        //ปุ่มค้นหาจากช่วงวันที่
         searchByDateRangeButton.setOnClickListener {
             if (startDate != null && endDate != null) {
                 if (startDate!!.before(endDate)) {
@@ -97,29 +97,35 @@ class SearchNewsActivity : AppCompatActivity() {
         }
     }
 
+    //แสดง datepicker
     private fun showDatePickerDialog(isStartDate: Boolean, isSingleDate: Boolean) {
+        //สร้าง instance และเก็บวันเดือนปี
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(
-            this,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                val selectedDate = Calendar.getInstance()
-                selectedDate.set(selectedYear, selectedMonth, selectedDay)
-                val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                val dateStr = dateFormat.format(selectedDate.time)
+        //สร้างตัวแปรมาเก็บวันที่เลือก
+        val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            //สร้าง instance อีกครั้งเพื่อเก็บวันที่เลือก
+            val selectedDate = Calendar.getInstance()
+            selectedDate.set(selectedYear, selectedMonth, selectedDay)
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            //เก็บวันที่เลือกพร้อม format
+            val dateStr = dateFormat.format(selectedDate.time)
 
                 when {
+                    //ถ้า isStart เป็น true คือวันที่เริ่มต้น
                     isStartDate -> {
                         startDateEditText.setText(dateStr)
                         startDate = selectedDate.time
                     }
+                    //ถ้า isSingle เป็น false คือวันที่สิ้นสุด
                     !isSingleDate -> {
                         endDateEditText.setText(dateStr)
                         endDate = selectedDate.time
                     }
+                    //ถ้า false ทั้งคู่คือเลือกวันที่เฉยๆ
                     else -> {
                         searchByDateEditText.setText(dateStr)
                     }
@@ -127,11 +133,12 @@ class SearchNewsActivity : AppCompatActivity() {
             },
             year, month, day
         )
-
         datePickerDialog.show()
     }
 
+    //ค้นหาจากชื่อ
     private fun searchNewsByName(query: String) {
+        //ส่งข้อมูลไปหน้าแสดงผล
         val intent = Intent(this, SearchResultActivity::class.java).apply {
             putExtra("SEARCH_QUERY", query)
             putExtra("SEARCH_TYPE", "NAME")
@@ -139,9 +146,11 @@ class SearchNewsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    //ค้นหาจากวันที่
     private fun searchNewsByDate(date: Date) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dateString = dateFormat.format(date)
+        //ส่งข้อมูลไปหน้าแสดงผล
         val intent = Intent(this, SearchResultActivity::class.java).apply {
             putExtra("SEARCH_QUERY", dateString)
             putExtra("SEARCH_TYPE", "DATE")
@@ -149,10 +158,12 @@ class SearchNewsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    //ค้นหาจากช่วงวันที่
     private fun searchNewsByDateRange(startDate: Date, endDate: Date) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val startDateString = dateFormat.format(startDate)
         val endDateString = dateFormat.format(endDate)
+        //ส่งข้อมูลไปหน้าแสดงผล
         val intent = Intent(this, SearchResultActivity::class.java).apply {
             putExtra("START_DATE", startDateString)
             putExtra("END_DATE", endDateString)
@@ -160,15 +171,4 @@ class SearchNewsActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        // ใช้ Intent ที่ไม่ซ้ำกันเพื่อลบ stack เดิม
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-        finish()
-    }
-
-
 }

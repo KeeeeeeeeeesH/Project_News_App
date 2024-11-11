@@ -21,6 +21,7 @@ class VisitHistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_visit_history)
 
+        //toolbar ย้อนกลับ
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -29,9 +30,10 @@ class VisitHistoryActivity : AppCompatActivity() {
         visitHistoryRecyclerView = findViewById(R.id.visit_history_recycler_view)
         visitHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.VISIT_HISTORY)
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.VISIT_HISTORY) //ใช้ Visit_History Type
         visitHistoryRecyclerView.adapter = newsAdapter
 
+        //SharedPref
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         memId = sharedPreferences.getInt("memId", -1)
 
@@ -42,6 +44,7 @@ class VisitHistoryActivity : AppCompatActivity() {
         }
     }
 
+    //ดึงข้อมูลประวัติการอ่าน
     private fun fetchReadHistory() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getReadHistoryByMemId(memId).enqueue(object : Callback<List<Read_HistoryData>> {
@@ -60,6 +63,7 @@ class VisitHistoryActivity : AppCompatActivity() {
         })
     }
 
+    //แสดงข่าวตามประวัติการอ่านพร้อมปรับปรุง element
     private fun fetchNewsData(readHistoryList: List<Read_HistoryData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getAllNews().enqueue(object : Callback<List<NewsData>> {
@@ -71,11 +75,11 @@ class VisitHistoryActivity : AppCompatActivity() {
                         news?.let {
                             ReadHistoryWithNewsData(
                                 newsId = it.newsId,
-                                readDate = readHistory.readDate,
+                                readDate = readHistory.readDate, //เปลี่ยนเป็นวันที่อ่านข่าว (ดึงจากโครงสร้างตรงๆ)
                                 newsName = it.newsName,
-                                ratingScore = it.ratingScore,
+                                ratingScore = it.ratingScore, //เปลี่ยนค่าเป็นคะแนนของฉัน (ในฟังก์ชัน)
                                 coverImage = it.coverImage ?: "",
-                                readCount = it.readCount
+                                readCount = it.readCount //เปลี่ยนค่าเป็นยอดการอ่านของฉัน (ในฟังก์ชัน)
                             )
                         }
                     }
@@ -91,12 +95,14 @@ class VisitHistoryActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงเฉพาะจำนวนการอ่านตัวเอง
     private fun fetchReadCounts(readHistoryWithNewsList: List<ReadHistoryWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getMemberTotalReadById(memId).enqueue(object : Callback<List<Total_ReadData>> {
             override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
                 if (response.isSuccessful) {
                     val readCounts = response.body() ?: listOf()
+                    //เอาเฉพาะจำนวนการอ่านของ memId โดยใช้ count นับ
                     readHistoryWithNewsList.forEach { news ->
                         news.readCount = readCounts.count { it.newsId == news.newsId && it.memId == memId }
                     }
@@ -112,15 +118,15 @@ class VisitHistoryActivity : AppCompatActivity() {
         })
     }
 
-
+    //ดึงเฉพาะคะแนนตัวเอง
     private fun fetchRatings(readHistoryWithNewsList: List<ReadHistoryWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getMemberRatingByMemId(memId).enqueue(object : Callback<List<News_RatingData>> {
             override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
                 if (response.isSuccessful) {
                     val ratings = response.body() ?: listOf()
+                    //เอาเฉพาะคะแนนของ memId โดยใช้ find
                     readHistoryWithNewsList.forEach { news ->
-                        // ดึงคะแนนเฉพาะของสมาชิกคนปัจจุบัน
                         val memberRating = ratings.find { it.newsId == news.newsId }
                         news.ratingScore = memberRating?.ratingScore ?: 0f
                     }
@@ -159,7 +165,7 @@ class VisitHistoryActivity : AppCompatActivity() {
         newsAdapter.setNews(readHistoryWithNewsList)
     }
 
-    // Function to delete read history
+    // ลบประวัติการอ่าน
     fun deleteReadHistory(memId: Int, newsId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         val call = apiService.deleteReadHistory(memId, newsId)

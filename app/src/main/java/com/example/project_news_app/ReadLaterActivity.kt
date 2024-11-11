@@ -21,6 +21,7 @@ class ReadLaterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_later)
 
+        //toolbar ย้อนกลับ
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -29,10 +30,10 @@ class ReadLaterActivity : AppCompatActivity() {
         readLaterRecyclerView = findViewById(R.id.read_later_recycler_view)
         readLaterRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.READ_LATER)
-
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.READ_LATER) //ใช้ Read_Later Type
         readLaterRecyclerView.adapter = newsAdapter
 
+       //SharedPref
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         memId = sharedPreferences.getInt("memId", -1)
 
@@ -43,12 +44,14 @@ class ReadLaterActivity : AppCompatActivity() {
         }
     }
 
+    //ดึงข้อมูลข่าวอ่านภายหลัง
     private fun fetchReadLaterNews() {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getReadLaterByMemId(memId).enqueue(object : Callback<List<Read_LaterData>> {
             override fun onResponse(call: Call<List<Read_LaterData>>, response: Response<List<Read_LaterData>>) {
                 if (response.isSuccessful) {
                     val readLaterList = response.body() ?: listOf()
+                    //ถ้ามีข้อมูล ไปดึงข่าวมาแสดง
                     if (readLaterList.isNotEmpty()) {
                         fetchNewsData(readLaterList)
                     } else {
@@ -65,14 +68,18 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงข้อมูลข่าวที่จะแสดง
     private fun fetchNewsData(readLaterList: List<Read_LaterData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        //ดึงข่าวทั้งหมดมา
         apiService.getAllNews().enqueue(object : Callback<List<NewsData>> {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
                     val newsList = response.body() ?: emptyList()
+                    //map หา newsId ที่ตรงกันทั้งคู่
                     val readLaterWithNewsList = readLaterList.mapNotNull { readLater ->
                         val news = newsList.find { it.newsId == readLater.newsId }
+                        //ถ้าเจอจะสร้างชุดข้อมูลมาแสดงรายละเอียด
                         news?.let {
                             ReadLaterWithNewsData(
                                 newsId = it.newsId,
@@ -84,7 +91,7 @@ class ReadLaterActivity : AppCompatActivity() {
                             )
                         }
                     }
-                    // ดึงข้อมูลการอ่านเมื่อเสร็จสิ้น
+                    // ดึงข้อมูลการอ่านเมื่อเสร็จ
                     fetchReadCounts(readLaterWithNewsList)
                 } else {
                     Toast.makeText(this@ReadLaterActivity, "โหลดข้อมูลข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
@@ -97,6 +104,7 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงจำนวนการอ่าน
     private fun fetchReadCounts(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
@@ -118,6 +126,7 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงคะแนนข่าว
     private fun fetchRatings(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getNewsRating().enqueue(object : Callback<List<News_RatingData>> {
@@ -144,6 +153,7 @@ class ReadLaterActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงรูปปก
     private fun fetchCoverImages(readLaterWithNewsList: List<ReadLaterWithNewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         readLaterWithNewsList.forEach { news ->

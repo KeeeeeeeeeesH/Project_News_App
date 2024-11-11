@@ -29,6 +29,7 @@ class SearchResultActivity : AppCompatActivity() {
         newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.GENERAL)
         newsRecyclerView.adapter = newsAdapter
 
+        //set toolbar
         val toolbar: androidx.appcompat.widget.Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -36,19 +37,18 @@ class SearchResultActivity : AppCompatActivity() {
 
         // ดึงข้อมูลข่าวจาก API ก่อนทำการค้นหา
         loadAllNews {
-            // หลังจากดึงข้อมูลเสร็จแล้ว ทำการค้นหาต่อ
+            // รับค่ารูปแบบการค้นหา
             val searchType = intent.getStringExtra("SEARCH_TYPE")
+            // ค้นหาข้อมูลตามรูปแบบที่เลือก
             when (searchType) {
                 "NAME" -> {
                     val query = intent.getStringExtra("SEARCH_QUERY") ?: return@loadAllNews
                     searchNews(query)
                 }
-
                 "DATE" -> {
                     val query = intent.getStringExtra("SEARCH_QUERY") ?: return@loadAllNews
                     searchNewsByDate(query)
                 }
-
                 "DATE_RANGE" -> {
                     val startDateStr = intent.getStringExtra("START_DATE")
                     val endDateStr = intent.getStringExtra("END_DATE")
@@ -60,12 +60,13 @@ class SearchResultActivity : AppCompatActivity() {
         }
     }
 
+    //ดึงข้อมูลข่าวทั้งหมด
     private fun loadAllNews(onLoaded: () -> Unit) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getAllNews().enqueue(object : Callback<List<NewsData>> {
             override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                 if (response.isSuccessful) {
-                    allNewsList = response.body() ?: listOf()
+                    allNewsList = response.body() ?: listOf() //เก็บไว้ใน allNewsList
                     onLoaded()  // เรียกเมื่อโหลดข่าวเสร็จสิ้น
                 } else {
                     Toast.makeText(this@SearchResultActivity, "โหลดข้อมูลข่าวไม่สำเร็จ", Toast.LENGTH_SHORT).show()
@@ -78,25 +79,27 @@ class SearchResultActivity : AppCompatActivity() {
         })
     }
 
+    //กรองการค้นหาตามชื่อ
     private fun searchNews(query: String) {
         val filteredNewsList = allNewsList.filter {
-            it.newsName.contains(query, ignoreCase = true)
-        }.distinctBy { it.newsId }
+            it.newsName.contains(query, ignoreCase = true) //ไม่สนใจตัวเล็ก-ใหญ่
+        }.distinctBy { it.newsId } //ป้องกันข่าวซ้ำ
 
         fetchReadCounts(filteredNewsList)
     }
 
+    //กรองการค้นหาตามวันที่
     private fun searchNewsByDate(query: String) {
         val filteredNewsList = allNewsList.filter {
-            it.dateAdded != null && isDateMatch(it.dateAdded, query)
+            it.dateAdded != null && isDateMatch(it.dateAdded, query) //วันที่เพิ่มข่าวต้องตรงกับวันที่เลือก
         }.distinctBy { it.newsId }
 
         fetchReadCounts(filteredNewsList)
     }
 
+    //กรองการค้นหาตามช่วงวันที่
     private fun searchNewsByDateRange(startDateStr: String, endDateStr: String) {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
         val startDate = dateFormat.parse(startDateStr)
         val endDate = dateFormat.parse(endDateStr)
 
@@ -105,22 +108,22 @@ class SearchResultActivity : AppCompatActivity() {
             return
         }
 
-        // ปรับ endDate ให้เป็น 23.59.59 แก้ปัญหาเรื่อง timezone
+        // ปรับวันที่สิ้นสุดให้เป็น 23.59.59 แก้ปัญหาเรื่อง timezone
         val calendar = Calendar.getInstance()
         calendar.time = endDate
         calendar.set(Calendar.HOUR_OF_DAY, 23)
         calendar.set(Calendar.MINUTE, 59)
         calendar.set(Calendar.SECOND, 59)
-        val adjustedEndDate = calendar.time
+        val adjustedEndDate = calendar.time //กลายเป็นวันที่สิ้นสุดตาม format
 
+        //กรองเอาข่าวที่มีวันที่ข่าวที่อยู่ในช่วงวันที่
         val filteredNewsList = allNewsList.filter {
             it.dateAdded != null && it.dateAdded.after(startDate) && it.dateAdded.before(adjustedEndDate)
         }
-
         fetchReadCounts(filteredNewsList)
     }
 
-
+    //ตรวจสอบวันที่ของข่าวกับที่ query
     private fun isDateMatch(date: Date, query: String): Boolean {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val dateString = dateFormat.format(date)
@@ -194,6 +197,6 @@ class SearchResultActivity : AppCompatActivity() {
                 }
             })
         }
-        newsAdapter.setNews(newsList) // รีเฟรชรายการข่าวหลังจากดึงข้อมูลทั้งหมด
+        newsAdapter.setNews(newsList)
     }
 }

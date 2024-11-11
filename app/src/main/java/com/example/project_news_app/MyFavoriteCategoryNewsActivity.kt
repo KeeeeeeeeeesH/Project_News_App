@@ -35,8 +35,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         // ตั้งค่า Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        // ซ่อน Title ที่มากับ Toolbar เพื่อใช้ TextView ตรงกลางแทน
+        // ใช้ TextView ตรงกลางแทน
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         selectedCategoriesTextView = findViewById(R.id.selected_categories_text_view)
@@ -48,10 +47,10 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
 
         favoriteNewsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.FAVORITE)
+        newsAdapter = NewsAdapter(listOf(), NewsAdapter.NewsType.FAVORITE) //เรียกใช้ Favorite Type
         favoriteNewsRecyclerView.adapter = newsAdapter
 
-        // การตั้งค่าปุ่มลอยเพื่อแก้ไขหมวดหมู่
+        // ตั้งค่าปุ่มแก้ไข
         val editButton: FloatingActionButton = findViewById(R.id.edit_button)
         editButton.setOnClickListener {
             val intent = Intent(this, SelectFavoriteActivity::class.java)
@@ -59,6 +58,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        //ตั้งค่า bottomNav
         bottomNavigation.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
@@ -76,9 +76,9 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
             }
         }
 
+        //SharedPref
         val sharedPreferences = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         memId = sharedPreferences.getInt("memId", -1)
-
         if (memId != -1) {
             fetchAllCategories { // เมื่อหมวดหมู่โหลดเสร็จแล้ว
                 fetchFavoriteNews() // ดึงข่าวในหมวดหมู่โปรด
@@ -91,16 +91,18 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         }
     }
 
+    //ดึงข้อมูลหมวดหมู่ทั้งหมดก่อน
     private fun fetchAllCategories(onComplete: () -> Unit) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getCategory().enqueue(object : Callback<List<CategoryData>> {
             override fun onResponse(call: Call<List<CategoryData>>, response: Response<List<CategoryData>>) {
                 if (response.isSuccessful) {
                     val categories = response.body()
+                    //แปลง id เป็น name
                     categories?.forEach { category ->
                         categoryMap[category.catId] = category.catName
                     }
-                    onComplete()  // เรียก callback หลังจากที่ข้อมูลหมวดหมู่ถูกโหลด
+                    onComplete() // ทำงานต่อได้
                 } else {
                     Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดข้อมูลหมวดหมู่ได้", Toast.LENGTH_SHORT).show()
                 }
@@ -112,11 +114,13 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงข่าวตามหมวดหมู่โปรด
     private fun fetchFavoriteNews() {
         progressBar.visibility = View.VISIBLE
-
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
+        //เตรียมข้อมูลหมวดหมู่ไว้ก่อน จะได้ไม่ต้องแปลงซ้ำอีกรอบ
         fetchAllCategories {
+            //ดึงข่าวที่ catId ตรงกันทั้ง 2 ตาราง
             apiService.getNewsByFavoriteCategory(memId).enqueue(object : Callback<List<NewsData>> {
                 override fun onResponse(call: Call<List<NewsData>>, response: Response<List<NewsData>>) {
                     if (response.isSuccessful) {
@@ -124,7 +128,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                         if (newsList.isEmpty()) {
                             Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่พบข่าวในหมวดหมู่โปรด", Toast.LENGTH_SHORT).show()
                         } else {
-                            fetchAdditionalNewsData(newsList)
+                            fetchReadCount(newsList) //ไปดึงจำนวนการอ่าน
                         }
                     } else {
                         Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถดึงข้อมูลข่าวในหมวดหมู่โปรดได้", Toast.LENGTH_SHORT).show()
@@ -140,13 +144,14 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         }
     }
 
-
+    //ดึงชื่อหมวดหมู่ที่เลือกมาแสดง
     private fun fetchSelectedCategories(memId: Int) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
         apiService.getFavoriteCategoryByMemId(memId).enqueue(object : Callback<List<Favorite_CategoryData>> {
             override fun onResponse(call: Call<List<Favorite_CategoryData>>, response: Response<List<Favorite_CategoryData>>) {
                 if (response.isSuccessful) {
                     val categories = response.body()
+                    //ให้วนลูปฟังก์ชันเพื่อเข้าถึงข้อมูลที่ map แล้ว
                     val categoryNames = categories?.joinToString(", ") { getCategoryNameById(it.catId) }
                     selectedCategoriesTextView.text = "หมวดหมู่ที่เลือก: $categoryNames"
                 } else {
@@ -160,14 +165,13 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
         })
     }
 
+    //ดึงชื่อจาก map มาหาว่าชื่อไร
     private fun getCategoryNameById(catId: Int): String {
-        return categoryMap[catId] ?: "Unknown Category"  // ส่งคืนชื่อหมวดหมู่ตาม catId หรือส่งคืน "Unknown Category" ถ้าไม่พบ
+        return categoryMap[catId] ?: "Unknown Category"
     }
 
-    private fun fetchAdditionalNewsData(newsList: List<NewsData>) {
+    private fun fetchReadCount(newsList: List<NewsData>) {
         val apiService = RetrofitClient.getClient(this).create(ApiService::class.java)
-
-        // Fetch read counts
         apiService.getTotalRead().enqueue(object : Callback<List<Total_ReadData>> {
             override fun onResponse(call: Call<List<Total_ReadData>>, response: Response<List<Total_ReadData>>) {
                 if (response.isSuccessful) {
@@ -175,7 +179,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                     newsList.forEach { news ->
                         news.readCount = readCounts.count { it.newsId == news.newsId }
                     }
-                    fetchRatings(newsList)
+                    fetchRatings(newsList) //ไปดึงคะแนนต่อ
                 } else {
                     Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดยอดการอ่านข่าวได้", Toast.LENGTH_SHORT).show()
                 }
@@ -201,7 +205,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                             0f
                         }
                     }
-                    fetchCoverImages(newsList)
+                    fetchCoverImages(newsList) //ไปดึงรูปปกต่อ
                 } else {
                     Toast.makeText(this@MyFavoriteCategoryNewsActivity, "ไม่สามารถโหลดคะแนนข่าวได้", Toast.LENGTH_SHORT).show()
                 }
@@ -233,7 +237,7 @@ class MyFavoriteCategoryNewsActivity : AppCompatActivity() {
                 }
             })
         }
-        newsAdapter.setNews(newsList)
+        newsAdapter.setNews(newsList) //ดึงครบแล้ว update ลง adapter
     }
 }
 

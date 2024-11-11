@@ -34,7 +34,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Title and Category -->
             <TextView
                 android:id="@+id/news_name"
                 android:layout_width="wrap_content"
@@ -83,7 +82,7 @@
                 android:textSize="16sp"
                 android:layout_marginTop="4dp" />
 
-            <!-- News Image Container -->
+            <!-- News Image -->
             <LinearLayout
                 android:id="@+id/news_images_container"
                 android:layout_width="match_parent"
@@ -109,7 +108,6 @@
                 android:textSize="16sp"
                 android:layout_marginTop="8dp" />
 
-            <!-- Rating Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -118,7 +116,7 @@
                 android:textStyle="bold"
                 android:layout_marginTop="16dp" />
 
-            <!-- RatingBar for Rating -->
+            <!-- RatingBar -->
             <RatingBar
                 android:id="@+id/rating_bar"
                 android:layout_width="wrap_content"
