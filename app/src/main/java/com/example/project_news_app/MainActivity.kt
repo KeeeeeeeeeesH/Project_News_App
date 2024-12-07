@@ -261,7 +261,7 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<List<News_RatingData>>, response: Response<List<News_RatingData>>) {
                 if (response.isSuccessful) {
                     val ratings = response.body() ?: listOf()
-                    //loop เหมือนไอตัวข้างบน
+                    //loop เหมือนตัวข้างบน
                     newsList.forEach { news ->
                         val newsRatings = ratings.filter { it.newsId == news.newsId }
                         //หาค่าเฉลี่ยของข่าวที่ได้
